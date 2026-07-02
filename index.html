@@ -210,6 +210,13 @@
       font-weight: 760;
     }
 
+    .toolbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
     .count {
       display: inline-flex;
       align-items: center;
@@ -364,8 +371,13 @@
       }
 
       .actions .btn,
-      #openAllBtn {
+      .toolbar-actions .btn {
         width: 100%;
+      }
+
+      .toolbar-actions {
+        display: grid;
+        grid-template-columns: 1fr;
       }
     }
 
@@ -506,7 +518,10 @@
             <span>结果表格</span>
             <span class="count" id="poiCount">0</span>
           </div>
-          <button class="btn light" id="openAllBtn" type="button">打开全部链接</button>
+          <div class="toolbar-actions">
+            <button class="btn light" id="copyLinksBtn" type="button">复制全部链接</button>
+            <button class="btn light" id="openAllBtn" type="button">打开全部链接</button>
+          </div>
         </div>
 
         <div class="table-wrap" id="tableWrap">
@@ -948,6 +963,37 @@
       return `"${String(value || "").replaceAll('"', '""')}"`;
     }
 
+    async function copyAllLinks() {
+      const validPois = pois.filter((poi) => poi.name.trim());
+      const text = validPois
+        .map((poi, index) => `${index + 1}. ${poi.name}\n${mapUrl(poi)}`)
+        .join("\n\n");
+
+      if (!text) {
+        saveStatus.textContent = "暂无可复制链接";
+        return;
+      }
+
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const textarea = document.createElement("textarea");
+          textarea.value = text;
+          textarea.setAttribute("readonly", "");
+          textarea.style.position = "fixed";
+          textarea.style.top = "-1000px";
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand("copy");
+          textarea.remove();
+        }
+        saveStatus.textContent = `已复制 ${validPois.length} 个链接`;
+      } catch {
+        saveStatus.textContent = "复制失败，请逐个打开链接";
+      }
+    }
+
     document.querySelector("#extractBtn").addEventListener("click", () => {
       const extracted = parsePois(sourceText.value, cityInput.value);
       pois = extracted.length ? extracted : pois;
@@ -964,6 +1010,7 @@
 
     document.querySelector("#addBtn").addEventListener("click", addBlankPoi);
     document.querySelector("#csvBtn").addEventListener("click", downloadCsv);
+    document.querySelector("#copyLinksBtn").addEventListener("click", copyAllLinks);
 
     document.querySelector("#clearBtn").addEventListener("click", () => {
       sourceText.value = "";
