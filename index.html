@@ -1,0 +1,1827 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Guide to Maps</title>
+  <style>
+    :root {
+      --bg: #f7f4ef;
+      --panel: #ffffff;
+      --ink: #1d1d1f;
+      --muted: #6f6a63;
+      --faint: #9a948b;
+      --line: #e7e0d7;
+      --soft: #f4efe7;
+      --soft-2: #faf8f4;
+      --accent: #315f52;
+      --accent-soft: #e7f0eb;
+      --danger: #a13b32;
+      --shadow: 0 18px 50px rgba(64, 50, 34, 0.08);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, rgba(224, 247, 250, 0.55) 0, rgba(247, 244, 239, 0) 92px),
+        var(--bg);
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .app {
+      position: relative;
+      width: min(1420px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 42px 0 42px;
+    }
+
+    .hero {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .hero-note {
+      color: var(--accent);
+      font-family: "Bradley Hand", "Comic Sans MS", "Segoe Print", cursive;
+      font-size: clamp(18px, 2vw, 24px);
+      line-height: 1.35;
+      transform: rotate(-2deg);
+      white-space: nowrap;
+    }
+
+    .hero-note::after {
+      content: "";
+      display: block;
+      width: 150px;
+      height: 10px;
+      margin: 2px 0 0 auto;
+      border-bottom: 2px solid rgba(49, 95, 82, 0.55);
+      border-radius: 50%;
+      transform: rotate(-4deg);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(38px, 5vw, 64px);
+      line-height: 0.98;
+      font-weight: 760;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 12px 0 0;
+      color: #35312c;
+      font-size: clamp(18px, 2vw, 24px);
+      line-height: 1.25;
+      font-weight: 620;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(360px, 0.78fr) minmax(560px, 1.22fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+
+    .input-panel {
+      padding: 26px;
+      position: sticky;
+      top: 16px;
+    }
+
+    label {
+      display: block;
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .field-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .field-head label {
+      margin: 0;
+      color: var(--accent);
+      font-size: 24px;
+      line-height: 1.15;
+      font-weight: 780;
+    }
+
+    textarea,
+    input,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--soft-2);
+      color: var(--ink);
+      outline: 0;
+    }
+
+    textarea:focus,
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(49, 95, 82, 0.12);
+    }
+
+    textarea {
+      min-height: 430px;
+      padding: 18px;
+      resize: vertical;
+      line-height: 1.65;
+      font-size: 15px;
+    }
+
+    input,
+    select {
+      min-height: 44px;
+      padding: 10px 12px;
+    }
+
+    .city-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      margin-top: 18px;
+      align-items: end;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      margin-top: 16px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 10px 15px;
+      border-radius: 999px;
+      color: #fff;
+      background: var(--accent);
+      font-size: 14px;
+      font-weight: 720;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(49, 95, 82, 0.16);
+    }
+
+    .btn.secondary {
+      background: #2d2d2f;
+    }
+
+    .btn.light {
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn.ghost {
+      min-height: 38px;
+      padding: 8px 10px;
+      background: transparent;
+      color: var(--accent);
+      border: 0;
+      box-shadow: none;
+    }
+
+    .btn.ghost:hover {
+      box-shadow: none;
+      background: var(--accent-soft);
+    }
+
+    .btn.warn {
+      background: #8a673d;
+    }
+
+    .btn.danger {
+      background: #fff7f5;
+      color: var(--danger);
+      border: 1px solid #efd1ca;
+    }
+
+    .btn.icon {
+      width: 38px;
+      min-height: 38px;
+      padding: 0;
+      font-size: 18px;
+    }
+
+    .result-panel {
+      padding: 16px;
+      position: relative;
+    }
+
+    .result-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .result-title {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+      font-weight: 760;
+    }
+
+    .result-heading {
+      margin: 0;
+      color: var(--accent);
+      font-size: 28px;
+      line-height: 1.2;
+    }
+
+    .result-subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .tool-btn {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      min-width: 74px;
+      min-height: 58px;
+      padding: 8px 10px;
+      border-radius: 14px;
+      background: transparent;
+      color: #4e554f;
+      font-size: 12px;
+      font-weight: 680;
+    }
+
+    .tool-btn:hover {
+      background: var(--soft-2);
+      box-shadow: none;
+      transform: translateY(-1px);
+    }
+
+    .tool-icon {
+      color: #566059;
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      height: 24px;
+      padding: 0 9px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 780;
+    }
+
+    .places-list,
+    #poiBody {
+      display: grid;
+      gap: 0;
+    }
+
+    .place-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 168px;
+      gap: 24px;
+      padding: 18px 0;
+      border: 1px solid var(--line);
+      border-width: 0 0 1px;
+      border-radius: var(--radius-md);
+      background: #fff;
+      box-shadow: none;
+    }
+
+    .place-card:first-child {
+      padding-top: 8px;
+    }
+
+    .place-card:last-child {
+      border-bottom: 0;
+      padding-bottom: 4px;
+    }
+
+    .place-main {
+      min-width: 0;
+      display: grid;
+      gap: 9px;
+      align-content: start;
+    }
+
+    .place-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .place-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #5f5a53;
+      font-size: 16px;
+      line-height: 1.35;
+    }
+
+    .place-pin {
+      flex: 0 0 auto;
+      filter: saturate(0.95);
+    }
+
+    .place-card input,
+    .place-card select,
+    .place-card textarea {
+      background: transparent;
+      border-color: transparent;
+      padding: 0;
+    }
+
+    .place-card input {
+      min-height: 26px;
+      font-weight: 500;
+    }
+
+    .place-card select {
+      width: auto;
+      max-width: 112px;
+      min-height: 28px;
+      padding: 3px 11px;
+      border-color: transparent;
+      border-radius: 999px;
+      background: #f6f0e7;
+      color: #4d4a43;
+      font-size: 13px;
+      font-weight: 650;
+      line-height: 1.2;
+    }
+
+    .place-name input {
+      width: 100%;
+      color: var(--ink);
+      font-size: clamp(20px, 1.65vw, 24px);
+      line-height: 1.18;
+      font-weight: 760;
+      letter-spacing: 0;
+    }
+
+    .place-area input {
+      width: 100%;
+      color: #5f5a53;
+      font-size: 16px;
+      line-height: 1.35;
+      font-weight: 500;
+    }
+
+    .place-card textarea {
+      min-height: 58px;
+      padding: 3px 0 0;
+      resize: vertical;
+      color: #2b2b2d;
+      font-size: 16px;
+      line-height: 1.65;
+      font-weight: 400;
+    }
+
+    .place-card input:focus,
+    .place-card select:focus,
+    .place-card textarea:focus {
+      background: var(--soft-2);
+      border-color: var(--accent);
+    }
+
+    .place-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      align-content: start;
+      align-self: center;
+      margin-top: 0;
+    }
+
+    .map-link {
+      display: inline-flex;
+      flex-direction: column;
+      grid-column: 1 / -1;
+      min-height: 72px;
+      padding: 13px 14px;
+      border-radius: 13px;
+      font-size: 16px;
+      line-height: 1.3;
+      font-weight: 760;
+      box-shadow: 0 14px 28px rgba(49, 95, 82, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      white-space: normal;
+      text-align: center;
+    }
+
+    .place-copy,
+    .place-delete {
+      min-height: 48px;
+      padding: 9px;
+      border-radius: 12px;
+      font-size: 21px;
+      color: #3e403d;
+      background: #fff;
+      border: 1px solid var(--line);
+      box-shadow: 0 5px 14px rgba(64, 50, 34, 0.05);
+    }
+
+    .place-delete {
+      color: var(--danger);
+      background: #fff;
+    }
+
+    .empty {
+      padding: 54px 22px;
+      color: var(--muted);
+      text-align: center;
+      border: 1px dashed var(--line);
+      border-radius: var(--radius-md);
+      background: var(--soft-2);
+    }
+
+    .empty-icon {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+
+    .empty-title {
+      margin: 0;
+      color: var(--ink);
+      font-size: 19px;
+      font-weight: 740;
+    }
+
+    .empty-copy {
+      margin: 8px auto 0;
+      max-width: 440px;
+      line-height: 1.6;
+    }
+
+    .link-drawer {
+      display: grid;
+      gap: 8px;
+      margin: 0 0 16px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--soft-2);
+    }
+
+    .link-drawer-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .link-drawer-close {
+      min-height: 30px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      color: var(--muted);
+      background: #fff;
+      border: 1px solid var(--line);
+      font-size: 12px;
+      box-shadow: none;
+    }
+
+    .bulk-map-link {
+      display: grid;
+      grid-template-columns: 26px 1fr;
+      gap: 10px;
+      align-items: center;
+      padding: 11px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--ink);
+      text-decoration: none;
+      font-weight: 650;
+    }
+
+    .bulk-map-link small {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .made-with {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      margin-top: 18px;
+      color: var(--accent);
+      font-family: "Bradley Hand", "Comic Sans MS", "Segoe Print", cursive;
+      font-size: 20px;
+      transform: rotate(-1deg);
+    }
+
+    .flight-mark {
+      position: relative;
+      display: inline-block;
+      width: 86px;
+      height: 28px;
+    }
+
+    .flight-mark::before {
+      content: "";
+      position: absolute;
+      inset: 10px 16px 0 0;
+      border-top: 2px dashed rgba(49, 95, 82, 0.45);
+      border-radius: 50%;
+      transform: rotate(-9deg);
+    }
+
+    .flight-mark::after {
+      content: "✈";
+      position: absolute;
+      right: 0;
+      top: 0;
+      color: var(--accent);
+      font-size: 24px;
+      transform: rotate(-15deg);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 980px) {
+      .app {
+        width: min(100vw - 20px, 760px);
+        padding-top: 34px;
+      }
+
+      .hero,
+      .workspace,
+      .city-row {
+        display: block;
+      }
+
+      .hero-note,
+      .made-with {
+        display: none;
+      }
+
+      .status {
+        margin-top: 12px;
+        white-space: normal;
+      }
+
+      .input-panel {
+        position: static;
+        margin-bottom: 14px;
+      }
+
+      .city-row .btn {
+        margin-top: 10px;
+      }
+
+      .city-row,
+      .place-card {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      textarea {
+        min-height: 300px;
+      }
+
+      .result-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .actions .btn,
+      .toolbar-actions .btn {
+        width: 100%;
+      }
+
+      .toolbar-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .tool-btn {
+        min-width: 0;
+      }
+    }
+
+    @media (max-width: 720px) {
+      body {
+        background: var(--bg);
+      }
+
+      .app {
+        width: 100%;
+        padding: 22px 10px 22px;
+      }
+
+      h1 {
+        font-size: 42px;
+      }
+
+      .panel {
+        border-radius: 20px;
+      }
+
+      .input-panel,
+      .result-panel {
+        padding: 16px;
+      }
+
+      textarea {
+        min-height: 220px;
+      }
+
+      .result-toolbar {
+        gap: 14px;
+        margin-bottom: 10px;
+      }
+
+      .result-title {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+      }
+
+      .result-heading {
+        font-size: 28px;
+      }
+
+      .toolbar-actions {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+        width: 100%;
+      }
+
+      .tool-btn {
+        min-height: 46px;
+        padding: 6px 4px;
+        border: 1px solid var(--line);
+        background: #fff;
+        font-size: 11px;
+        border-radius: 12px;
+      }
+
+      .tool-icon {
+        font-size: 18px;
+      }
+
+      .count {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        min-width: 34px;
+      }
+
+      .actions {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .btn,
+      .btn.icon {
+        width: 100%;
+      }
+
+      .place-card {
+        gap: 14px;
+        padding: 18px 0;
+      }
+
+      .place-head {
+        align-items: start;
+        gap: 8px;
+      }
+
+      .place-name input {
+        font-size: 22px;
+      }
+
+      .place-meta,
+      .place-area input,
+      .place-card textarea {
+        font-size: 15px;
+      }
+
+      .place-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        align-self: stretch;
+      }
+
+      .map-link {
+        grid-column: 1 / -1;
+        min-height: 54px;
+        padding: 10px 14px;
+        flex-direction: row;
+        gap: 8px;
+        font-size: 16px;
+      }
+
+      .place-copy,
+      .place-delete {
+        min-height: 44px;
+        font-size: 19px;
+      }
+
+      .field-head {
+        display: block;
+      }
+
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="hero" aria-labelledby="pageTitle">
+      <div>
+        <h1 id="pageTitle">Guide to Maps</h1>
+        <p class="subtitle">Turn any travel guide into Google Maps pins.</p>
+      </div>
+      <div class="hero-note">Save travel inspiration,<br>never miss a great place.</div>
+      <div class="status" id="saveStatus">已准备</div>
+    </section>
+
+    <section class="workspace">
+      <div class="panel input-panel">
+        <div class="field-head">
+          <label for="sourceText">✨ 粘贴旅行攻略</label>
+        </div>
+        <textarea id="sourceText" placeholder="粘贴小红书、博客、Reddit、公众号或 ChatGPT 旅行内容。&#10;我会提取地点，并生成 Google Maps 链接。"></textarea>
+
+        <div class="city-row">
+          <div>
+            <label for="cityInput">城市（可选）</label>
+            <input id="cityInput" type="text">
+          </div>
+          <button class="btn" id="extractBtn" type="button">提取地点</button>
+        </div>
+
+        <div class="actions">
+          <button class="btn light" id="sampleBtn" type="button">填入示例</button>
+          <button class="btn danger" id="clearBtn" type="button">清空</button>
+        </div>
+      </div>
+
+      <div class="panel result-panel">
+        <div class="result-toolbar">
+          <div class="result-title">
+            <h2 class="result-heading" id="resultHeading">📍 地点清单</h2>
+          </div>
+          <div class="toolbar-actions">
+            <button class="tool-btn" id="csvBtn" type="button"><span class="tool-icon">⇩</span><span>导出 CSV</span></button>
+            <button class="tool-btn" id="copyLinksBtn" type="button"><span class="tool-icon">⧉</span><span>复制全部</span></button>
+            <button class="tool-btn" id="openAllBtn" type="button"><span class="tool-icon">↗</span><span>打开全部</span></button>
+            <button class="tool-btn" id="addBtn" type="button"><span class="tool-icon">＋</span><span>新增地点</span></button>
+            <span class="count" id="poiCount">0</span>
+          </div>
+        </div>
+
+        <div class="places-list" id="tableWrap">
+          <div class="link-drawer hidden" id="linkDrawer"></div>
+          <div id="poiBody"></div>
+        </div>
+        <div class="empty" id="emptyState">
+          <div class="empty-icon">📍</div>
+          <p class="empty-title">粘贴一篇旅行攻略开始。</p>
+          <p class="empty-copy">我们会帮你提取咖啡店、餐厅、商店、景点和酒店。</p>
+        </div>
+        <div class="made-with">Made with love for travelers.<span class="flight-mark" aria-hidden="true"></span></div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "travel-poi-extractor-v1";
+    const TYPES = ["咖啡", "餐厅", "景点", "酒店", "购物", "其他"];
+    const TYPE_KEYWORDS = [
+      ["咖啡", ["咖啡", "珈琲", "☕", "cafe", "café", "coffee", "拿铁", "烘焙", "甜品"]],
+      ["餐厅", ["餐厅", "饭店", "食堂", "小馆", "麦当劳", "早餐", "朝ごはん", "橙汁", "果汁", "面包店", "面包", "吐司", "可颂", "法棍", "🥯", "🥖", "🍞", "🥐", "🌭", "排骨", "章鱼", "菜包肉", "牛排", "鱼饼", "米饭", "拼盘", "吃饭", "用餐", "bakery", "bread", "brunch", "bistro", "bistrò", "restaurant", "diner", "osteria", "pizzeria", "trattoria", "pizza", "grill", "料理", "午餐", "晚餐", "酒吧", "bar"]],
+      ["酒店", ["酒店", "hotel", "民宿", "住宿", "旅馆", "resort"]],
+      ["购物", ["购物", "商场", "百货", "买手店", "古着", "书店", "市集", "伴手礼", "纪念品", "九谷烧", "器物", "清酒杯", "茶杯", "花瓶", "工厂店", "百丽宫", "丹寧", "牛仔", "牛仔褲", "Jeans Street", "ABC Store", "montbell", "market", "boutique", "shop"]],
+      ["景点", ["景点", "博物馆", "美术馆", "小巷", "石阶", "公园", "花园", "教堂", "神社", "寺", "城", "岛", "島", "海", "宮", "宫", "塔", "广场", "廣場", "温泉", "金门大桥", "Lover's Point", "Las Vegas Strip", "Sphere Vista Point", "威尼斯人", "museum", "garden"]]
+    ];
+    const AREA_PATTERNS = [
+      /(Châtelet\s*-\s*Les Halles|Rue Saint-Honoré|Marais|Le Marais|Shibuya|Shinjuku|Ginza|Harajuku|Montmartre|Louvre)/i,
+      /([A-Za-zÀ-ÿ'’.\-\s]+(?:Street|St\.|Rue|Avenue|Ave\.|Road|Rd\.|Lane|Plaza|Square|Market))/i,
+      /([\u4e00-\u9fa5A-Za-zÀ-ÿ'’.\-\s]+(?:区|街|附近|周边|路|广场|商圈|车站|花园|公园|宫|馆|站))/
+    ];
+    const SAMPLE_TEXT = `🤍Partisan Café Artisanal
+玛黑区的时髦人有一半都在这家咖啡店，时尚浓度超高。
+
+🤍Cafe Verlet
+1880年营业至今的百年咖啡馆，坐落在著名的Rue Saint-Honoré街，是巴黎最古老的自烘焙咖啡店之一。
+
+🤍Motors Coffee
+这家咖啡店的受众会比较年轻化，位置在Châtelet - Les Halles附近，是一间将机车元素、街头潮流完美融合的时尚咖啡馆。`;
+
+    const sourceText = document.querySelector("#sourceText");
+    const cityInput = document.querySelector("#cityInput");
+    const saveStatus = document.querySelector("#saveStatus");
+    const poiBody = document.querySelector("#poiBody");
+    const poiCount = document.querySelector("#poiCount");
+    const emptyState = document.querySelector("#emptyState");
+    const tableWrap = document.querySelector("#tableWrap");
+    const linkDrawer = document.querySelector("#linkDrawer");
+
+    let pois = [];
+
+    function uid() {
+      return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+
+    function cleanPoiName(line) {
+      return line
+        .replace(/\s*[^\dA-Za-zÀ-ÿ\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]*\s*P\d+(?:\s*[-—~至到和、]\s*\d+)?\s*$/i, "")
+        .replace(/^(?:\s*(?:[0-9一二三四五六七八九十]+(?:\uFE0F?\u20E3)?|🔟)\s*)+/, "")
+        .replace(/^[\s\d一二三四五六七八九十]+[.)、．-]\s*/, "")
+        .replace(/^[\s#*•·\-–—|｜>]+/, "")
+        .replace(/^[^0-9A-Za-zÀ-ÿ\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]+/, "")
+        .replace(/[^0-9A-Za-zÀ-ÿ\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af）)]{1,4}$/u, "")
+        .replace(/[\s⭐★☆✦✧️]+$/g, "")
+        .replace(/[：:，,。.!！?？\s]+$/, "")
+        .trim();
+    }
+
+    function startsWithMarker(line) {
+      return /^[^0-9A-Za-zÀ-ÿ\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af\s]/.test(line);
+    }
+
+    function isNoiseLine(line) {
+      const text = line.trim();
+      if (!text) return true;
+      if (/^\[[#＃].+\]\(https?:\/\/.+\)/.test(text)) return true;
+      if (/^(?:[#＃][^\s#＃]+[\s]*)+$/.test(text)) return true;
+      return !/[0-9A-Za-zÀ-ÿ\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]/.test(text);
+    }
+
+    function isAddressLine(line) {
+      return /^\s*(?:📍|地址[:：]|位置[:：]|address[:：])/i.test(line.trim());
+    }
+
+    function cleanAddressLine(line) {
+      return line
+        .replace(/^\s*(?:📍|地址[:：]|位置[:：]|address[:：])\s*/i, "")
+        .trim();
+    }
+
+    function parseDetailLine(line) {
+      const text = line.trim();
+      const match = text.match(/^\s*(🏨|🈺|🍽️?|📝)\s*[：:]?\s*(.+)$/);
+      if (!match) return null;
+      const marker = match[1];
+      const content = match[2].trim();
+      if (/^P\d+(?:\s*[-—~至到和、]\s*\d+)?\s*[：:]/i.test(content)) return null;
+      return {
+        content,
+        kind: marker === "🏨" ? "area" : "detail"
+      };
+    }
+
+    function isSectionHeader(line) {
+      const text = cleanPoiName(line).replace(/[：:]\s*$/, "");
+      if (text.length > 28) return false;
+      if (/^附上.+店/.test(text)) return true;
+      return /(清单|小店|景点|美食|咖啡|餐厅|酒店|购物|路线|打卡|推荐|收藏|附录|list)$/i.test(text);
+    }
+
+    function parsePageSuffixPoi(line) {
+      const text = line.trim();
+      if (/^(?:附上|例如|比如|推荐|清单)/.test(text)) return null;
+      if (!/P\d+(?:\s*[-—~至到和、]\s*\d+)?\s*$/i.test(text)) return null;
+      const title = cleanPoiName(text);
+      if (!title || title.length > 50 || looksLikeSentence(title)) return null;
+      if (!/[0-9A-Za-zÀ-ÿ\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]/.test(title)) return null;
+      return { title, area: "", detail: "" };
+    }
+
+    function parseCaptionPoi(line) {
+      const text = cleanPoiName(line.trim());
+      const match = text.match(/^(?:图[一二三四五六七八九十\d]+(?:图[一二三四五六七八九十\d]+)*(?:[-—~至到和、图一二三四五六七八九十\d]*)?|P\d+(?:\s*[-—~至到和、]\s*\d+)?)\s*[：:]\s*(.+)$/i);
+      if (!match) return null;
+
+      const content = match[1].trim();
+      const titlePart = cleanCaptionTitle(content);
+      const detail = content.slice(titlePart.length).replace(/^[|｜：:。.!！?？，,\s]+/, "").trim();
+      const mixedAreaMatch = content.match(/^([A-ZÀ-Þ][A-Za-zÀ-ÿ'’.\-\s]{2,28})\s+([\u3400-\u9fff]{2,8})\s+(.{2,80})$/);
+      if (mixedAreaMatch) {
+        return {
+          title: cleanPoiName(cleanCaptionTitle(mixedAreaMatch[3])),
+          area: `${mixedAreaMatch[2].trim()} / ${mixedAreaMatch[1].trim()}`,
+          detail
+        };
+      }
+
+      const areaMatch = titlePart.match(/^([\u3400-\u9fff]{2,8}|[A-ZÀ-Þ][A-Za-zÀ-ÿ'’.\-\s]{2,28})\s+(.{2,80})$/);
+      if (areaMatch) {
+        return {
+          title: cleanPoiName(cleanCaptionTitle(areaMatch[2])),
+          area: areaMatch[1].trim(),
+          detail
+        };
+      }
+
+      return {
+        title: cleanPoiName(titlePart),
+        area: "",
+        detail
+      };
+    }
+
+    function cleanCaptionTitle(text) {
+      return text
+        .split(/[|｜]/)[0]
+        .split(/[。.!！?？]/)[0]
+        .replace(/[：:，,\s]+$/g, "")
+        .trim();
+    }
+
+    function mergeDuplicateGroups(groups) {
+      const merged = [];
+      const seen = new Map();
+      const seenByTitle = new Map();
+      for (const group of groups) {
+        group.title = refinePoiTitle(group.title || "");
+        if (!group.title) continue;
+        const titleKey = group.title.replace(/\s+/g, " ").trim().toLowerCase();
+        const areaKey = (group.area || "").replace(/\s+/g, " ").trim().toLowerCase();
+        const key = `${titleKey}__${areaKey}`;
+        const existing = seen.get(key) || seenByTitle.get(titleKey);
+        if (existing) {
+          if (!existing.area && group.area) existing.area = group.area;
+          existing.lines.push(...(group.lines || []));
+        } else {
+          const next = { ...group, lines: [...(group.lines || [])] };
+          seen.set(key, next);
+          seenByTitle.set(titleKey, next);
+          merged.push(next);
+        }
+      }
+      return merged;
+    }
+
+    function refinePoiTitle(title) {
+      return cleanPoiName(title)
+        .replace(/^(JR\s*[^站]{1,12}站).*$/i, "$1")
+        .replace(/^([^站\s]{2,8}站).+$/i, "$1")
+        .trim();
+    }
+
+    function parseInlinePoi(line) {
+      const text = line.trim();
+      const patterns = [
+        /(?:店名|餐厅|咖啡店|咖啡馆|cafe|café|restaurant|bakery|bistro|branch)\s*(?:叫|是|为|:|：)\s*([A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{2,50})(?:[（(]|，|,|。|\.|！|!|；|;|$)/i,
+        /(?:有家|一家|这家|附近有家|來到|来到)\s*(?:view很棒的|海景|宝藏|不錯的|不错的|很棒的)?\s*(?:cafe|café|咖啡店|咖啡馆|餐厅|面包店|bakery)?\s*[:：]?\s*([A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{2,50})(?:一定|[（(]|，|,|。|\.|！|!|；|;|$)/i
+      ];
+
+      for (const pattern of patterns) {
+        const match = text.match(pattern);
+        if (match && match[1]) {
+          const title = cleanPoiName(match[1]);
+          if (title && title.split(/\s+/).length <= 6) return title;
+        }
+      }
+      return "";
+    }
+
+    function normalizeEmbeddedPoiTitle(title) {
+      let text = refinePoiTitle(title)
+        .replace(/^(?:超大|大型|这座|整座|一座|一家|这家|很多很多|很多|整个|雨后傍晚的整个)/, "")
+        .replace(/^(?:雨中(?:的)?|雨后(?:的)?|傍晚(?:的)?|荒郊野岭(?:的)?)/, "")
+        .replace(/^(?:边上的|附近的|旁边的)/, "")
+        .trim();
+
+      const suffix = "(?:工厂店|温泉街|温泉|美术馆|博物馆|神社|案内所|车站|站|寺|城|岛|公园|花园|市场|商店|书店|买手店)";
+      const verbMatch = text.match(new RegExp(`(?:走到|回到|回|去了|去|到|在)([\\u3400-\\u9fffA-Za-z][\\u3400-\\u9fffA-Za-z0-9'’&.\\-\\s]*${suffix})$`));
+      if (verbMatch) text = verbMatch[1].trim();
+
+      const verbParts = text.split(/(?:走到|回到|来到|去了|去到|看到|回|去|到|在|就)/).map((part) => part.trim()).filter(Boolean);
+      const lastVerbPart = verbParts[verbParts.length - 1] || "";
+      if (lastVerbPart && new RegExp(`${suffix}$`).test(lastVerbPart)) text = lastVerbPart;
+
+      text = text
+        .replace(/^(?:超大|大型|这座|整座|一座|一家|这家)/, "")
+        .replace(/^(?:雨中(?:的)?|雨后(?:的)?|傍晚(?:的)?|荒郊野岭(?:的)?)/, "")
+        .replace(/^.*?的(?=[\u3400-\u9fffA-Za-z]{2,12}(?:站|公园|神社|寺|城|岛|温泉|案内所)$)/, "")
+        .replace(/^回(?=道后温泉)/, "")
+        .replace(/^(?:路上看到|看到|来到|去了|去到|到了|回到|走到|直接)/, "")
+        .replace(/^(?:倒是|然后|于是|终于|就是|已经是|还是可以|过了|一个)/, "")
+        .trim();
+
+      if (!text || text.length > 28) return "";
+      if (/(?:小城|整个天|原型)$/.test(text)) return "";
+      if (/^(?:人生背包|电车小城|油屋原型|上岛|坐船上岛|可以上岛|一个站|站|温泉街)$/.test(text)) return "";
+      if (/坐船|不敢|可以|本来|结果|直接|荒郊野岭/.test(text)) return "";
+      return text;
+    }
+
+    function appendInlinePois(groups, text, city) {
+      const seen = new Set(groups.map((group) => group.title));
+      const normalized = text
+        .replace(/\[[#＃][^\]]+\]\(https?:\/\/[^\)]+\)/g, "")
+        .replace(/\s+/g, " ");
+      const patterns = [
+        /\b(Jeans Street)\b/gi,
+        /\b(Cafe Japan Blue Garden)\b/gi,
+        /(JR\s*児島站)/gi,
+        /(瀨戶內海|濑户内海|瀬戸内海)/g
+      ];
+      for (const pattern of patterns) {
+        pattern.lastIndex = 0;
+        let match;
+        while ((match = pattern.exec(normalized))) {
+          const title = normalizeEmbeddedPoiTitle(match[1]);
+          if (!title || seen.has(title)) continue;
+          const start = Math.max(0, match.index - 45);
+          const end = Math.min(normalized.length, match.index + match[0].length + 80);
+          seen.add(title);
+          groups.push({
+            title,
+            area: city.trim(),
+            lines: [normalized.slice(start, end).trim()]
+          });
+        }
+      }
+      return groups;
+    }
+
+    function parseEmbeddedPois(text, city) {
+      const normalized = text
+        .replace(/\[[#＃][^\]]+\]\(https?:\/\/[^\)]+\)/g, "")
+        .replace(/\s+/g, " ");
+      const sentences = normalized
+        .split(/[。.!！?？\n]|(?:然后|于是|终于|晚上)/)
+        .map((sentence) => sentence.trim())
+        .filter(Boolean);
+      const groups = [];
+      const seen = new Set();
+      const patterns = [
+        /(?:超大|大型)?([A-Za-z][A-Za-z0-9'’&.\-\s]{1,28}工厂店)/gi,
+        /([\u3400-\u9fff]{2,18}(?:工厂店|温泉街|温泉|美术馆|博物馆|神社|案内所|车站|站|寺|城|岛|公园|花园|市场|商店|书店|买手店))/g,
+        /(?:去了|去|到|在|来到|走到)\s*([\u3400-\u9fffA-Za-z][\u3400-\u9fffA-Za-z0-9'’&.\-\s]{1,18})(?:[（(][^）)]*[）)])?\s*(?:吃饭|用餐|午餐|晚餐|喝咖啡|买东西)/g
+      ];
+
+      for (const sentence of sentences) {
+        for (const pattern of patterns) {
+          pattern.lastIndex = 0;
+          let match;
+          while ((match = pattern.exec(sentence))) {
+            const title = normalizeEmbeddedPoiTitle(match[1]);
+            const contextualTitle = contextualizeEmbeddedPoiTitle(title, sentence);
+            if (!contextualTitle || seen.has(contextualTitle)) continue;
+            seen.add(contextualTitle);
+            groups.push({
+              title: contextualTitle,
+              area: city.trim(),
+              lines: [sentence]
+            });
+          }
+        }
+      }
+
+      return groups;
+    }
+
+    function contextualizeEmbeddedPoiTitle(title, sentence) {
+      let text = title.replace(/^(.{2,8})的案内所$/, "$1观光案内所").trim();
+      if (text === "观光案内所") {
+        const areaMatch = sentence.match(/(?:一到|到|赶去)([\u3400-\u9fff]{2,6})(?:都|就|，|,|\s)/);
+        if (areaMatch && !/(时候|这里|那里|上岛|下车)/.test(areaMatch[1])) {
+          text = `${areaMatch[1]}观光案内所`;
+        }
+      }
+      return text;
+    }
+
+    function isDayHeader(line) {
+      return /^DAY\s*\d+/i.test(line.trim());
+    }
+
+    function getDayArea(line, fallbackCity) {
+      const text = line
+        .replace(/^DAY\s*\d+\s*/i, "")
+        .replace(/[（(].*?[）)]/g, "")
+        .trim();
+      if (!text) return fallbackCity.trim();
+      const parts = text.split(/➡️|->|→|到|至/).map((part) => cleanPoiName(part)).filter(Boolean);
+      return parts.slice(-1)[0] || fallbackCity.trim();
+    }
+
+    function parseItineraryPois(lines, city) {
+      if (!lines.some(isDayHeader) || !lines.some((line) => /(?:\d+\uFE0F?\u20E3|🔟)/.test(line))) return [];
+
+      const groups = [];
+      const seen = new Set();
+      let dayArea = city.trim();
+      let dayRoute = [];
+
+      function add(title, description, area = dayArea) {
+        const cleaned = normalizeItineraryTitle(title);
+        if (!cleaned || seen.has(cleaned)) return;
+        seen.add(cleaned);
+        groups.push({ title: cleaned, area: inferItineraryArea(cleaned, description, area || city.trim(), dayRoute, city), lines: [description].filter(Boolean) });
+      }
+
+      for (const rawLine of lines) {
+        const line = rawLine.trim();
+        if (!line || isNoiseLine(line)) continue;
+        if (isDayHeader(line)) {
+          dayArea = getDayArea(line, city);
+          dayRoute = line
+            .replace(/^DAY\s*\d+\s*/i, "")
+            .replace(/[（(].*?[）)]/g, "")
+            .split(/➡️|->|→|到|至/)
+            .map((part) => cleanPoiName(part))
+            .filter(Boolean);
+          continue;
+        }
+        const isNumbered = /^(?:\s*(?:[0-9一二三四五六七八九十]+(?:\uFE0F?\u20E3)?|🔟)|\d+[.)、．-])/.test(line);
+        if (!isNumbered && /^(?:Ps|PS|by the way)[:：\s]/i.test(line)) continue;
+        if (!isNumbered && !/(百丽宫|威尼斯人|Sphere Vista Point|Boudin Bakery|Warming Hut|ABC store|progun|strip|lover|金门大桥|唐人街|岭南小馆|渔人码头|联合广场|麦当劳)/i.test(line)) continue;
+
+        const content = (isNumbered ? line
+          .replace(/^(?:\s*(?:[0-9一二三四五六七八九十]+(?:\uFE0F?\u20E3)?|🔟)\s*)+/, "")
+          .replace(/^[\d一二三四五六七八九十]+[.)、．-]\s*/, "") : line)
+          .trim();
+        const pieces = content.split(/➡️|→|->|\+/).map((part) => part.trim()).filter(Boolean);
+
+        for (const piece of pieces) {
+          const candidates = extractItineraryCandidates(piece);
+          for (const candidate of candidates) add(candidate, piece);
+        }
+      }
+
+      return groups;
+    }
+
+    function inferItineraryArea(title, description, defaultArea, route, city) {
+      const text = `${title} ${description}`;
+      const routeHit = (pattern) => route.find((area) => pattern.test(area));
+      if (/(金门大桥|Warming Hut|Powell St|渔人码头|Boudin Bakery|联合广场|唐人街|岭南小馆)/i.test(text)) {
+        return routeHit(/旧金山|San Francisco/i) || defaultArea || city.trim();
+      }
+      if (/(百丽宫|Las Vegas Strip|ABC Store|Pro Gun Vegas|KA Show|威尼斯人|Sphere Vista Point)/i.test(text)) {
+        return routeHit(/拉斯维加斯|Las Vegas|lv/i) || defaultArea || city.trim();
+      }
+      if (/黑金麦当劳/.test(title) && route.length) return route[0];
+      return defaultArea || city.trim();
+    }
+
+    function extractItineraryCandidates(text) {
+      const candidates = [];
+      const patterns = [
+        /([\u3400-\u9fff]{0,10}(?:渔人码头|联合广场|唐人街|岭南小馆|金门大桥|黑金麦当劳|strip大街|百丽宫|威尼斯人))/g,
+        /([A-Z][A-Za-z0-9'’&.\-\s]{2,40}(?:Bakery|Store|Point|Centre|Center|Vista Point|Vegas|store))/gi,
+        /\b(Powell St|Warming Hut Park Store|Boudin Bakery|ABC store|progun vegas|Sphere Vista Point|lover’s point|lover's point|strip)\b/gi,
+        /(?:选了|选)(ka秀|awakening秀|o秀|ka)\b/gi
+      ];
+
+      for (const pattern of patterns) {
+        pattern.lastIndex = 0;
+        let match;
+        while ((match = pattern.exec(text))) {
+          candidates.push(match[1]);
+        }
+      }
+      return candidates;
+    }
+
+    function normalizeItineraryTitle(title) {
+      let text = cleanPoiName(title)
+        .replace(/^(?:先|再|又|还|去|到|在|逛|吃|打卡|体验|蹲守|选择作为|解决了|顺便|选了|选)/, "")
+        .replace(/^.*?(?=(?:渔人码头|联合广场|唐人街|岭南小馆|金门大桥|黑金麦当劳|strip大街|百丽宫|威尼斯人)$)/, "")
+        .replace(/(?:的)?(?:chowder|表情包|套餐|早饭|日落|黑皮kitty|窗户|海狮).*$/i, "")
+        .replace(/(?:的)?(?:welcome centre)$/i, " Welcome Center")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      const aliases = {
+        "金门大桥的 Welcome Center": "金门大桥 Welcome Center",
+        "金门大桥的welcome centre": "金门大桥 Welcome Center",
+        "金门大桥的welcome center": "金门大桥 Welcome Center",
+        "Welcome Center": "金门大桥 Welcome Center",
+        "lover’s point": "Lover's Point",
+        "lover's point": "Lover's Point",
+        "strip": "Las Vegas Strip",
+        "strip大街": "Las Vegas Strip",
+        "ABC store": "ABC Store",
+        "progun vegas": "Pro Gun Vegas",
+        "ka": "KA Show",
+        "ka秀": "KA Show",
+        "o秀": "O Show",
+        "awakening秀": "Awakening Show"
+      };
+      const key = Object.keys(aliases).find((item) => item.toLowerCase() === text.toLowerCase());
+      if (key) text = aliases[key];
+
+      if (!text || text.length < 2 || text.length > 42) return "";
+      if (/^(?:下午四点|早上起床|开车|小镇|这里|这家|晚上|中午|F|MP5|市长|公共交通|第二天|晴天滤镜|一日票|黑金麦当劳)$/.test(text)) return text === "黑金麦当劳" ? text : "";
+      if (/(?:很适合|不用|太热|不适合|不会再吃|解决了|顺便|漂亮|成群|不怕生|事实证明|建议提前)/.test(text)) return "";
+      return text;
+    }
+
+    function looksLikeSentence(line) {
+      const text = line.trim();
+      if (/[。.!！?？]/.test(text)) return true;
+      if (text.length > 24 && /[的了在是有和与就都也很超多不用可以看到随处最近由于去年那天]/.test(text)) return true;
+      if (/^(这座|周末|日剧|列车|火车|不用|雨季|尾道有意思)/.test(text)) return true;
+      return false;
+    }
+
+    function isShortPoiCandidate(line, nextLine, inListSection, startsBlock) {
+      const cleaned = cleanPoiName(line);
+      if (!inListSection || !startsBlock || !cleaned || cleaned.length > 42) return false;
+      if (isSectionHeader(line) || isNoiseLine(line) || looksLikeSentence(cleaned)) return false;
+      if (nextLine && isSectionHeader(nextLine)) return false;
+      if (/^[0-9A-Za-zÀ-ÿ\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af][0-9A-Za-zÀ-ÿ\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af'’&.\-\s（）()・の]+$/.test(cleaned)) return true;
+      return false;
+    }
+
+    function isPoiTitle(line) {
+      const raw = line.trim();
+      const cleaned = cleanPoiName(raw);
+      if (!cleaned || cleaned.length > 54) return false;
+      if (isAddressLine(raw)) return false;
+      if (parseDetailLine(raw)) return false;
+      if (/^(?:\s*(?:[0-9一二三四五六七八九十]+(?:\uFE0F?\u20E3)|🔟)\s*)+\S+/.test(raw)) return true;
+      if (/^[\d一二三四五六七八九十]+[.)、．-]\s*\S+/.test(raw)) return true;
+      if (/^[#*•·\-–—|｜>]/.test(raw)) return true;
+      if (startsWithMarker(raw)) {
+        if (looksLikeSentence(cleaned)) return false;
+        if (/(很多|有点|不怎么|可以|看到|坐拥|满满|不用|随处|特别|可能|期待值)/.test(cleaned)) return false;
+        return true;
+      }
+      if (/^[A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]+$/.test(cleaned) && cleaned.split(/\s+/).length <= 6) return true;
+      return false;
+    }
+
+    function classifyType(text) {
+      const lower = text.toLowerCase();
+      if (/^(?:渔人码头|联合广场|唐人街|金门大桥|Lover's Point|Las Vegas Strip|Sphere Vista Point|威尼斯人)/i.test(text)) return "景点";
+      if (/^(?:JR\s*児島站|瀨戶內海|濑户内海|瀬戸内海)/i.test(text)) return "景点";
+      if (/^Jeans Street/i.test(text)) return "购物";
+      if (/^.{0,30}(珈琲|咖啡|cafe|café|coffee)/i.test(text)) return "咖啡";
+      if (/(面包店|面包|吐司|可颂|法棍|🥯|🥖|🍞|🥐|bakery|bread)/i.test(lower)) return "餐厅";
+      for (const [type, words] of TYPE_KEYWORDS) {
+        if (words.some((word) => lower.includes(word.toLowerCase()))) return type;
+      }
+      if (/^.{0,30}(景点|博物馆|美术馆|小巷|石阶|公园|花园|教堂|神社|寺|宫|塔|广场|museum|garden)/i.test(text)) return "景点";
+      return "其他";
+    }
+
+    function detectArea(text, city) {
+      for (const pattern of AREA_PATTERNS) {
+        const match = text.match(pattern);
+        if (match && match[1]) {
+          const area = match[1]
+            .replace(/^(坐落在|位于|位置在|在|靠近|附近是|著名的)/, "")
+            .replace(/附近$/, "")
+            .replace(/[，,。.!！?？].*$/, "")
+            .trim();
+          if (/^(从|因为|这次|今天|昨天|后来|可以|几乎|所有|主要|点餐|支付|国内|带了|昨天后来)/.test(area)) continue;
+          if (area.length > 18 || /小城/.test(area)) continue;
+          if (/Jeans Street/i.test(area) || /^(?:車站|车站)$/.test(area)) continue;
+          if (/(周边|指路|下单|回忆|社区)$/.test(area) || /^(但和|店内|时髦社区|友指路)/.test(area)) continue;
+          if (area && city && !area.toLowerCase().includes(city.toLowerCase())) return `${area} / ${city}`;
+          if (area) return area;
+        }
+      }
+      return city || "";
+    }
+
+    function summarizeReason(name, type, description) {
+      const text = description.replace(/\s+/g, " ").trim();
+      if (!text) return name ? `${name} 值得顺路加入清单。` : "";
+      const sentences = text.split(/[。.!！?？\n]/).map((item) => item.trim()).filter(Boolean);
+      const sentence = sentences.find((item) => /(适合|推荐|必吃|好吃|好看|好拍|好逛|选品|陈列|货品|价格|亲民|门口|有意思|创意|风格|氛围|历史|海景|风景|宽敞|特色)/.test(item)) || sentences[0] || text;
+      const compact = sentence.length > 42 ? `${sentence.slice(0, 42)}...` : sentence;
+      if (type === "咖啡") return `${compact}，适合安排咖啡休息。`;
+      if (type === "餐厅") return `${compact}，适合加入用餐备选。`;
+      if (type === "景点") return `${compact}，适合安排参观或散步。`;
+      if (type === "酒店") return `${compact}，适合作为住宿参考。`;
+      if (type === "购物") return `${compact}，适合加入逛街清单。`;
+      return `${compact}，值得加入旅行清单。`;
+    }
+
+    function summarizeClue(description) {
+      return description
+        .split(/[。.!！?？\n]/)
+        .map((item) => item.trim())
+        .filter((item) => item && item.length <= 24)
+        .slice(0, 3)
+        .join("、");
+    }
+
+    function mapUrl(poi) {
+      const area = String(poi.area || "")
+        .replace(/\s*\/\s*/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+      const query = [poi.name, area].filter(Boolean).join(" ");
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query).replace(/%20/g, "+")}`;
+    }
+
+    function parsePois(text, city) {
+      const lines = text
+        .replace(/\[[#＃][^\]]+\]\(https?:\/\/[^\)]+\)/g, "")
+        .split(/\r?\n/)
+        .map((line) => line.trim());
+      const itineraryGroups = parseItineraryPois(lines, city);
+      if (itineraryGroups.length >= 3) return groupsToPois(itineraryGroups, city);
+
+      const groups = [];
+      let current = null;
+      let inListSection = false;
+      let startsBlock = true;
+
+      for (let index = 0; index < lines.length; index += 1) {
+        const trimmed = lines[index];
+        const nextLine = lines[index + 1] || "";
+        if (!trimmed || isNoiseLine(trimmed)) {
+          startsBlock = true;
+          continue;
+        }
+
+        if (isAddressLine(trimmed)) {
+          const address = cleanAddressLine(trimmed);
+          if (current && address) {
+            current.area = current.area || address;
+            current.lines.push(address);
+          }
+          startsBlock = true;
+          continue;
+        }
+
+        const detailLine = parseDetailLine(trimmed);
+        if (detailLine) {
+          if (current && detailLine.content) {
+            if (detailLine.kind === "area") current.area = current.area || detailLine.content;
+            current.lines.push(detailLine.content);
+          }
+          startsBlock = detailLine.kind === "area";
+          continue;
+        }
+
+        if (isSectionHeader(trimmed)) {
+          if (current) groups.push(current);
+          current = null;
+          inListSection = true;
+          startsBlock = true;
+          continue;
+        }
+
+        const pageSuffixPoi = parsePageSuffixPoi(trimmed);
+        const captionPoi = parseCaptionPoi(trimmed);
+        if (pageSuffixPoi && pageSuffixPoi.title) {
+          if (current) groups.push(current);
+          current = { title: pageSuffixPoi.title, area: pageSuffixPoi.area, lines: [] };
+        } else if (captionPoi && captionPoi.title) {
+          if (current) groups.push(current);
+          current = { title: captionPoi.title, area: captionPoi.area, lines: captionPoi.detail ? [captionPoi.detail] : [] };
+        } else if (isPoiTitle(trimmed) || isShortPoiCandidate(trimmed, nextLine, inListSection, startsBlock)) {
+          if (current) groups.push(current);
+          current = { title: cleanPoiName(trimmed), lines: [] };
+        } else if (current) {
+          current.lines.push(trimmed);
+        }
+        startsBlock = false;
+      }
+      if (current) groups.push(current);
+      appendInlinePois(groups, text, city);
+
+      if (!groups.length) {
+        const inlineTitle = parseInlinePoi(text);
+        if (inlineTitle) {
+          groups.push({
+            title: inlineTitle,
+            lines: lines.filter((line) => line && !isNoiseLine(line))
+          });
+        }
+      }
+
+      if (!groups.length) {
+        groups.push(...parseEmbeddedPois(text, city));
+      }
+
+      if (!groups.length) {
+        const blocks = text
+          .split(/\n\s*\n/)
+          .map((block) => block.trim())
+          .filter(Boolean);
+
+        for (const block of blocks) {
+          const blockLines = block.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+          const firstLine = blockLines[0] || "";
+          const titleMatch = firstLine.match(/^(?:[\s#*•·\-–—|｜>\d一二三四五六七八九十.)、．]+)?([^，,。.!！?？：:]{2,54})(?:[：:，,。.!！?？]\s*)?(.*)$/);
+          if (titleMatch) {
+            const title = cleanPoiName(titleMatch[1]);
+            const firstDescription = titleMatch[2] || "";
+            if (title) groups.push({ title, lines: [firstDescription, ...blockLines.slice(1)].filter(Boolean) });
+          }
+        }
+      }
+
+      return groupsToPois(groups, city);
+    }
+
+    function groupsToPois(groups, city) {
+      return mergeDuplicateGroups(groups)
+        .filter((group) => group.title)
+        .map((group) => {
+          const description = group.lines.join("。");
+          const fullText = `${group.title} ${description}`;
+          const type = classifyType(fullText);
+          return {
+            id: uid(),
+            name: group.title,
+            area: group.area ? (city.trim() && group.area.toLowerCase() !== city.trim().toLowerCase() ? `${group.area} / ${city.trim()}` : group.area) : detectArea(description, city.trim()),
+            type,
+            reason: summarizeReason(group.title, type, description),
+            clue: summarizeClue(description)
+          };
+        });
+    }
+
+    function typeLabel(type) {
+      const labels = {
+        "咖啡": "咖啡",
+        "餐厅": "餐厅",
+        "景点": "景点",
+        "酒店": "酒店",
+        "购物": "购物",
+        "其他": "其他"
+      };
+      return labels[type] || type || "其他";
+    }
+
+    function typeIcon(type) {
+      const icons = {
+        "咖啡": "☕",
+        "餐厅": "🍽️",
+        "景点": "📍",
+        "酒店": "🛏️",
+        "购物": "🛍️",
+        "其他": "✨"
+      };
+      return icons[type] || "✨";
+    }
+
+    function updateResultSummary() {
+      poiCount.textContent = String(pois.length);
+    }
+
+    function render() {
+      poiBody.innerHTML = "";
+      linkDrawer?.classList?.add?.("hidden");
+      if (linkDrawer) linkDrawer.innerHTML = "";
+      pois = pois.map((poi) => ({ clue: "", ...poi }));
+      updateResultSummary();
+      emptyState.classList.toggle("hidden", pois.length > 0);
+      tableWrap.classList.toggle("hidden", pois.length === 0);
+
+      for (const poi of pois) {
+        const card = document.createElement("article");
+        card.className = "place-card";
+        card.innerHTML = `
+          <div class="place-main">
+            <div class="place-head">
+              <div class="place-name">
+                <input data-field="name" value="${escapeHtml(poi.name)}" aria-label="地点名称">
+              </div>
+              <select data-field="type" aria-label="类型">
+                ${TYPES.map((type) => `<option value="${type}" ${type === poi.type ? "selected" : ""}>${typeIcon(type)} ${typeLabel(type)}</option>`).join("")}
+              </select>
+            </div>
+            <div class="place-meta">
+              <span class="place-pin" aria-hidden="true">📍</span>
+              <div class="place-area">
+                <input data-field="area" value="${escapeHtml(poi.area)}" aria-label="区域或城市">
+              </div>
+            </div>
+            <textarea data-field="reason" aria-label="推荐理由">${escapeHtml(poi.reason)}</textarea>
+          </div>
+          <div class="place-actions">
+            <a class="btn map-link" href="${mapUrl(poi)}" target="_blank" rel="noopener"><span aria-hidden="true">📍</span><span>Google Maps</span></a>
+            <button class="btn light place-copy" type="button" title="复制" aria-label="复制">⧉</button>
+            <button class="btn danger place-delete" type="button" title="删除" aria-label="删除">✕</button>
+          </div>
+        `;
+
+        card.querySelectorAll("[data-field]").forEach((field) => {
+          field.addEventListener("input", () => {
+            poi[field.dataset.field] = field.value;
+            card.querySelector(".map-link").href = mapUrl(poi);
+            updateResultSummary();
+            persist();
+          });
+        });
+
+        card.querySelector(".place-copy").addEventListener("click", async () => {
+          await copyText(`${poi.name}\n${mapUrl(poi)}`, "已复制该地点链接");
+        });
+
+        card.querySelector(".place-delete").addEventListener("click", () => {
+          pois = pois.filter((item) => item.id !== poi.id);
+          render();
+          persist();
+        });
+
+        poiBody.appendChild(card);
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function openAllLinks() {
+      const validPois = pois.filter((poi) => poi.name.trim());
+      if (!validPois.length) {
+        saveStatus.textContent = "暂无可打开链接";
+        return;
+      }
+
+      if (validPois.length === 1) {
+        window.open(mapUrl(validPois[0]), "_blank");
+        return;
+      }
+
+      let openedCount = 0;
+      for (const poi of validPois) {
+        const opened = window.open(mapUrl(poi), "_blank");
+        if (opened) openedCount += 1;
+      }
+
+      if (openedCount === validPois.length) {
+        saveStatus.textContent = `已打开 ${openedCount} 个 Google Maps 标签`;
+        return;
+      }
+
+      saveStatus.textContent = openedCount
+        ? `已打开 ${openedCount} 个，其余可能被浏览器拦截`
+        : "浏览器拦截了新标签，已生成链接清单";
+      renderLinkDrawer(validPois);
+    }
+
+    function renderLinkDrawer(validPois) {
+      const linksHtml = validPois.map((poi, index) => {
+        const url = mapUrl(poi);
+        return `
+          <a class="bulk-map-link" href="${url}" target="_blank" rel="noopener">
+            <span>${index + 1}</span>
+            <span>
+              <strong>${escapeHtml(poi.name)}</strong>
+              <small>${escapeHtml(String(poi.area || "").replace(/\s*\/\s*/g, " ") || "Google Maps")}</small>
+            </span>
+          </a>
+        `;
+      }).join("");
+
+      if (!linkDrawer) {
+        copyAllLinks();
+        return;
+      }
+
+      linkDrawer.innerHTML = `
+        <div class="link-drawer-head">
+          <span>已生成 ${validPois.length} 个 Google Maps 链接，逐个点击打开</span>
+          <button class="link-drawer-close" type="button">收起</button>
+        </div>
+        ${linksHtml}
+      `;
+      linkDrawer.classList.remove("hidden");
+      linkDrawer.querySelector(".link-drawer-close").addEventListener("click", () => {
+        linkDrawer.classList.add("hidden");
+        linkDrawer.innerHTML = "";
+      });
+      linkDrawer.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function persist() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        text: sourceText.value,
+        city: cityInput.value,
+        pois
+      }));
+      saveStatus.textContent = `已保存 ${new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`;
+    }
+
+    function loadSaved() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return;
+      try {
+        const data = JSON.parse(saved);
+        sourceText.value = data.text || "";
+        cityInput.value = data.city || "";
+        pois = Array.isArray(data.pois) ? data.pois.map((poi) => ({ clue: "", ...poi })) : [];
+        render();
+        saveStatus.textContent = "已恢复上次内容";
+      } catch {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    }
+
+    function addBlankPoi() {
+      const city = cityInput.value.trim();
+      pois.push({
+        id: uid(),
+        name: "",
+        area: city,
+        type: "其他",
+        reason: "",
+        clue: ""
+      });
+      render();
+      persist();
+    }
+
+    function downloadCsv() {
+      const headers = ["POI 名称", "城市/区域", "类型", "推荐理由", "原文线索", "Google Maps 链接"];
+      const rows = pois.map((poi) => [poi.name, poi.area, poi.type, poi.reason, poi.clue, mapUrl(poi)]);
+      const csv = [headers, ...rows].map((row) => row.map(csvCell).join(",")).join("\n");
+      const blob = new Blob([`\ufeff${csv}`], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `travel-poi-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function csvCell(value) {
+      return `"${String(value || "").replaceAll('"', '""')}"`;
+    }
+
+    async function copyAllLinks() {
+      const validPois = pois.filter((poi) => poi.name.trim());
+      const text = validPois
+        .map((poi, index) => `${index + 1}. ${poi.name}\n${mapUrl(poi)}`)
+        .join("\n\n");
+
+      if (!text) {
+        saveStatus.textContent = "暂无可复制链接";
+        return;
+      }
+
+      await copyText(text, `已复制 ${validPois.length} 个链接`);
+    }
+
+    async function copyText(text, successMessage) {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const textarea = document.createElement("textarea");
+          textarea.value = text;
+          textarea.setAttribute("readonly", "");
+          textarea.style.position = "fixed";
+          textarea.style.top = "-1000px";
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand("copy");
+          textarea.remove();
+        }
+        saveStatus.textContent = successMessage;
+      } catch {
+        saveStatus.textContent = "复制失败，请逐个打开链接";
+      }
+    }
+
+    document.querySelector("#extractBtn").addEventListener("click", () => {
+      const extracted = parsePois(sourceText.value, cityInput.value);
+      pois = extracted.length ? extracted : pois;
+      render();
+      persist();
+      saveStatus.textContent = extracted.length ? `已提取 ${extracted.length} 个地点` : "未识别到新地点";
+    });
+
+    document.querySelector("#sampleBtn").addEventListener("click", () => {
+      sourceText.value = SAMPLE_TEXT;
+      cityInput.value = cityInput.value || "Paris";
+      persist();
+    });
+
+    document.querySelector("#addBtn").addEventListener("click", addBlankPoi);
+    document.querySelector("#csvBtn").addEventListener("click", downloadCsv);
+    document.querySelector("#copyLinksBtn").addEventListener("click", copyAllLinks);
+
+    document.querySelector("#clearBtn").addEventListener("click", () => {
+      sourceText.value = "";
+      cityInput.value = "";
+      pois = [];
+      localStorage.removeItem(STORAGE_KEY);
+      render();
+      saveStatus.textContent = "已清空";
+    });
+
+    document.querySelector("#openAllBtn").addEventListener("click", openAllLinks);
+
+    sourceText.addEventListener("input", persist);
+    cityInput.addEventListener("input", () => {
+      updateResultSummary();
+      persist();
+    });
+
+    loadSaved();
+    render();
+  </script>
+</body>
+</html>
