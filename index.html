@@ -130,11 +130,6 @@
       font-size: 14px;
     }
 
-    .field-hint {
-      color: var(--faint);
-      font-size: 12px;
-    }
-
     textarea,
     input,
     select {
@@ -529,10 +524,6 @@
         display: block;
       }
 
-      .field-hint {
-        display: block;
-        margin-top: 4px;
-      }
     }
   </style>
 </head>
@@ -550,14 +541,13 @@
       <div class="panel input-panel">
         <div class="field-head">
           <label for="sourceText">旅行攻略正文</label>
-          <span class="field-hint">粘贴小红书、博客、Reddit、公众号、ChatGPT 行程建议等内容。</span>
         </div>
-        <textarea id="sourceText" placeholder="把旅行攻略粘贴到这里…&#10;支持小红书、博客、Reddit、公众号、ChatGPT 行程建议等内容。"></textarea>
+        <textarea id="sourceText" placeholder="粘贴小红书、博客、Reddit、公众号或 ChatGPT 旅行内容。&#10;我会提取地点，并生成 Google Maps 链接。"></textarea>
 
         <div class="city-row">
           <div>
             <label for="cityInput">城市（可选）</label>
-            <input id="cityInput" type="text" placeholder="Paris, Tokyo, Kyoto">
+            <input id="cityInput" type="text">
           </div>
           <button class="btn" id="extractBtn" type="button">提取地点</button>
         </div>
@@ -574,7 +564,6 @@
         <div class="result-toolbar">
           <div class="result-title">
             <h2 class="result-heading" id="resultHeading">地点清单</h2>
-            <p class="result-subtitle" id="resultSummary">粘贴一篇旅行攻略开始。</p>
           </div>
           <div class="toolbar-actions">
             <button class="btn light" id="copyLinksBtn" type="button">复制全部链接</button>
@@ -624,7 +613,6 @@
     const saveStatus = document.querySelector("#saveStatus");
     const poiBody = document.querySelector("#poiBody");
     const poiCount = document.querySelector("#poiCount");
-    const resultSummary = document.querySelector("#resultSummary");
     const emptyState = document.querySelector("#emptyState");
     const tableWrap = document.querySelector("#tableWrap");
 
@@ -980,14 +968,7 @@
     }
 
     function updateResultSummary() {
-      const count = pois.length;
-      poiCount.textContent = String(count);
-      if (!count) {
-        resultSummary.textContent = "粘贴一篇旅行攻略开始。";
-        return;
-      }
-      const city = cityInput.value.trim();
-      resultSummary.textContent = city ? `已找到 ${count} 个地点 · ${city}` : `已找到 ${count} 个地点`;
+      poiCount.textContent = String(pois.length);
     }
 
     function render() {
