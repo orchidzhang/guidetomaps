@@ -1,0 +1,35 @@
+{
+  "name": "emoji-mixed-xiaohongshu",
+  "city": "",
+  "input": "Day1 沉浸式体验高千穗峡\n🚣高千穗峡的正确打开方式，绝对是亲手划着小船驶入峡谷腹地。两岸是陡峭的岩壁垂着浓绿的植被，船桨划开透亮的水面，慢慢靠近瀑布的那一刻，凉丝丝的水汽扑面而来。\n⚠️友情提示：划船的票一定要提前两周预订，现场基本捡不到余票。\n🍜划完船直奔山脚下的老铺，夏天限定的流水素面是必打卡项目。\n当天往返熊本市区大概两小时车程，晚上还能顺路逛个熊本城的夜景。\n\n☀️Day2 懒人友好的九州一日路线\n第二天不想自己转公交折腾，直接在 Klook上报了熊本出发的九州一日行程。\n✔️上午（草千里）：辽阔的草原连着远处的火山轮廓。\n✔️中午（阿苏神社）：作为全国四百多座阿苏神社的本源，古杉林立的参道特别有氛围感。\n✔️下午（黑川温泉），整条温泉街都是古朴的日式建筑。\n\n古城墙和要塞：门票40欧/人，但俯瞰整个老城区的视角非常值。从Pile Gate进入，逆时针参观。\n2️⃣古城和黑水湾：餐厅和商店很多，也有权利的游戏的打卡地！（Onofrio喷泉、Jesuit阶梯、Fort Lovrijenac），有一家店叫“Peppino’s Gelato”。\n3️⃣View Point of Dubrovnik：p3，观景点，可以直接俯瞰整个杜城，📍Viewpoint of Dubrovnik P5，Google Map可以找到。\n\n🇯🇵高松小众艺术区散步🚶北浜 alley路线\n在高松逛街太开心了，分北浜 alley和市区2篇来记录一下。比较热门的Umie也在这。\n✔️Umie最好提前订位，窗边景观位可以看到大海。\n✔️iam with bread：漂亮面包店，种类超级多！\n✔️kitahama blue stories：超好逛，有很多濑户内海艺术祭周边。\n✔️element：中古玩具店，有很多胶娃喜欢。\n✔️206 TSU MA MU：可以路过买个乳蛋饼。",
+  "expectedPois": [
+    "高千穗峡",
+    "熊本城",
+    "草千里",
+    "阿苏神社",
+    "黑川温泉",
+    "古城墙和要塞",
+    "Pile Gate",
+    "古城和黑水湾",
+    "Onofrio Fountain",
+    "Jesuit Stairs",
+    "Fort Lovrijenac",
+    "Peppino’s Gelato",
+    "View Point of Dubrovnik",
+    "北浜 alley",
+    "Umie",
+    "iam with bread",
+    "kitahama blue stories",
+    "element",
+    "206 TSU MA MU"
+  ],
+  "unexpectedPois": [
+    "友情提示",
+    "划完船直奔山脚下的老铺",
+    "餐厅和商店",
+    "权游纪念品商店",
+    "高松小众艺术区散步",
+    "第二天不想自己转公交折腾",
+    "整条温泉街"
+  ]
+}

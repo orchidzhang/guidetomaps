@@ -1,0 +1,15 @@
+{
+  "name": "paris-cafes",
+  "city": "Paris",
+  "input": "🤍Partisan Café Artisanal\n玛黑区的时髦人有一半都在这家咖啡店，时尚浓度超高。\n\n🤍Cafe Verlet\n1880年营业至今的百年咖啡馆，坐落在著名的Rue Saint-Honoré街，是巴黎最古老的自烘焙咖啡店之一。\n\n🤍Motors Coffee\n这家咖啡店的受众会比较年轻化，位置在Châtelet - Les Halles附近，是一间将机车元素、街头潮流完美融合的时尚咖啡馆。",
+  "expectedPois": [
+    "Partisan Café Artisanal",
+    "Cafe Verlet",
+    "Motors Coffee"
+  ],
+  "unexpectedPois": [
+    "玛黑区的时髦人有一半都在这家咖啡店",
+    "1880年营业至今的百年咖啡馆",
+    "这家咖啡店的受众会比较年轻化"
+  ]
+}

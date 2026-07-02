@@ -188,18 +188,20 @@
     }
 
     .city-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 12px;
-      margin-top: 18px;
-      align-items: end;
+      margin: 0 0 16px;
     }
 
     .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 9px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
       margin-top: 16px;
+    }
+
+    .actions .btn.primary {
+      grid-column: 1 / -1;
+      min-height: 48px;
+      font-size: 15px;
     }
 
     .btn {
@@ -266,8 +268,11 @@
     }
 
     .result-panel {
-      padding: 16px;
+      padding: 0;
       position: relative;
+      background: transparent;
+      border-color: transparent;
+      box-shadow: none;
     }
 
     .result-toolbar {
@@ -275,7 +280,8 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
+      padding: 4px 6px 0;
     }
 
     .result-title {
@@ -356,14 +362,22 @@
       gap: 0;
     }
 
+    .places-list {
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
     .place-card {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 168px;
       gap: 24px;
-      padding: 18px 0;
+      padding: 20px 0;
       border: 1px solid var(--line);
       border-width: 0 0 1px;
-      border-radius: var(--radius-md);
+      border-radius: 0;
       background: #fff;
       box-shadow: none;
     }
@@ -420,9 +434,10 @@
 
     .place-card select {
       width: auto;
-      max-width: 112px;
-      min-height: 28px;
-      padding: 3px 11px;
+      min-width: 96px;
+      max-width: 132px;
+      min-height: 32px;
+      padding: 5px 30px 5px 14px;
       border-color: transparent;
       border-radius: 999px;
       background: #f6f0e7;
@@ -430,6 +445,8 @@
       font-size: 13px;
       font-weight: 650;
       line-height: 1.2;
+      text-align: center;
+      text-align-last: center;
     }
 
     .place-name input {
@@ -637,8 +654,7 @@
       }
 
       .hero,
-      .workspace,
-      .city-row {
+      .workspace {
         display: block;
       }
 
@@ -657,11 +673,6 @@
         margin-bottom: 14px;
       }
 
-      .city-row .btn {
-        margin-top: 10px;
-      }
-
-      .city-row,
       .place-card {
         display: grid;
         grid-template-columns: 1fr;
@@ -674,11 +685,6 @@
       .result-toolbar {
         align-items: stretch;
         flex-direction: column;
-      }
-
-      .actions {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
       }
 
       .actions .btn,
@@ -732,8 +738,12 @@
       }
 
       .input-panel,
-      .result-panel {
+      .places-list {
         padding: 16px;
+      }
+
+      .result-panel {
+        padding: 0;
       }
 
       textarea {
@@ -832,12 +842,13 @@
 
       .place-card {
         gap: 14px;
-        padding: 16px;
-        margin: 10px 0;
+        padding: 16px 0;
+        margin: 0;
         border: 1px solid var(--line);
-        border-radius: 18px;
+        border-width: 0 0 1px;
+        border-radius: 0;
         background: #fff;
-        box-shadow: 0 10px 24px rgba(64, 50, 34, 0.05);
+        box-shadow: none;
       }
 
       .place-card:first-child {
@@ -872,9 +883,10 @@
       }
 
       .place-card select {
-        max-width: 104px;
-        min-height: 28px;
-        padding: 3px 9px;
+        min-width: 92px;
+        max-width: 120px;
+        min-height: 32px;
+        padding: 5px 28px 5px 12px;
         background: #f6f0e7;
         font-size: 12px;
       }
@@ -936,19 +948,16 @@
         <div class="field-head">
           <label for="sourceText">✨ 粘贴旅行攻略</label>
         </div>
+        <div class="city-row">
+          <label for="cityInput">城市（可选）</label>
+          <input id="cityInput" type="text">
+        </div>
         <textarea id="sourceText" placeholder="粘贴小红书、博客、Reddit、公众号或 ChatGPT 旅行内容。&#10;我会提取地点，并生成 Google Maps 链接。"></textarea>
 
-        <div class="city-row">
-          <div>
-            <label for="cityInput">城市（可选）</label>
-            <input id="cityInput" type="text">
-          </div>
-          <button class="btn" id="extractBtn" type="button">提取地点</button>
-        </div>
-
         <div class="actions">
-          <button class="btn light" id="sampleBtn" type="button">填入示例</button>
+          <button class="btn primary" id="extractBtn" type="button">提取地点</button>
           <button class="btn danger" id="clearBtn" type="button">清空</button>
+          <button class="btn light" id="sampleBtn" type="button">填入示例</button>
         </div>
       </div>
 
@@ -988,7 +997,7 @@
       ["餐厅", ["餐厅", "饭店", "食堂", "小馆", "麦当劳", "早餐", "朝ごはん", "橙汁", "果汁", "面包店", "面包", "吐司", "可颂", "法棍", "🥯", "🥖", "🍞", "🥐", "🌭", "排骨", "章鱼", "菜包肉", "牛排", "鱼饼", "米饭", "拼盘", "吃饭", "用餐", "bakery", "bread", "brunch", "bistro", "bistrò", "restaurant", "diner", "osteria", "pizzeria", "trattoria", "pizza", "grill", "料理", "午餐", "晚餐", "酒吧", "bar"]],
       ["酒店", ["酒店", "hotel", "民宿", "住宿", "旅馆", "resort"]],
       ["购物", ["购物", "商场", "百货", "买手店", "古着", "书店", "市集", "伴手礼", "纪念品", "九谷烧", "器物", "清酒杯", "茶杯", "花瓶", "工厂店", "百丽宫", "丹寧", "牛仔", "牛仔褲", "Jeans Street", "ABC Store", "montbell", "market", "boutique", "shop"]],
-      ["景点", ["景点", "博物馆", "美术馆", "小巷", "石阶", "公园", "花园", "教堂", "神社", "寺", "城", "岛", "島", "海", "宮", "宫", "塔", "广场", "廣場", "温泉", "金门大桥", "Lover's Point", "Las Vegas Strip", "Sphere Vista Point", "威尼斯人", "museum", "garden"]]
+      ["景点", ["景点", "博物馆", "美术馆", "小巷", "石阶", "公园", "花园", "教堂", "神社", "寺", "城", "岛", "島", "海", "海岸", "大桥", "站前", "浜", "宮", "宫", "塔", "广场", "廣場", "温泉", "金门大桥", "Lover's Point", "Las Vegas Strip", "Sphere Vista Point", "威尼斯人", "museum", "garden"]]
     ];
     const AREA_PATTERNS = [
       /(Châtelet\s*-\s*Les Halles|Rue Saint-Honoré|Marais|Le Marais|Shibuya|Shinjuku|Ginza|Harajuku|Montmartre|Louvre)/i,
@@ -1069,6 +1078,7 @@
 
     function isSectionHeader(line) {
       const text = cleanPoiName(line).replace(/[：:]\s*$/, "");
+      if (/^(?:图[一二三四五六七八九十\d]+|P\d+)/i.test(text)) return false;
       if (text.length > 28) return false;
       if (/^附上.+店/.test(text)) return true;
       return /(清单|小店|景点|美食|咖啡|餐厅|酒店|购物|路线|打卡|推荐|收藏|附录|list)$/i.test(text);
@@ -1085,13 +1095,21 @@
     }
 
     function parseCaptionPoi(line) {
-      const text = cleanPoiName(line.trim());
-      const match = text.match(/^(?:图[一二三四五六七八九十\d]+(?:图[一二三四五六七八九十\d]+)*(?:[-—~至到和、图一二三四五六七八九十\d]*)?|P\d+(?:\s*[-—~至到和、]\s*\d+)?)\s*[：:]\s*(.+)$/i);
+      const text = cleanPoiName(line.trim().replace(/[（(][^）)]*$/, ""));
+      const match = text.match(/^(?:图[一二三四五六七八九十\d]+(?:图[一二三四五六七八九十\d]+)*(?:[-—~至到和、图一二三四五六七八九十\d]*)?|P\d+(?:\s*[-—~至到和、]\s*\d+)?)\s*(?:[：:]\s*)?(.+)$/i);
       if (!match) return null;
 
-      const content = match[1].trim();
+      const content = match[1].trim().replace(/[（(][^）)]*$/, "").trim();
+      if (!content || content.length > 54 || looksLikeSentence(content)) return null;
       const titlePart = cleanCaptionTitle(content);
       const detail = content.slice(titlePart.length).replace(/^[|｜：:。.!！?？，,\s]+/, "").trim();
+      if (/^[A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{2,54}$/i.test(titlePart) && /(?:coffee|cafe|café|bakery|gelato|bread)$/i.test(titlePart)) {
+        return {
+          title: cleanPoiName(titlePart),
+          area: "",
+          detail
+        };
+      }
       const mixedAreaMatch = content.match(/^([A-ZÀ-Þ][A-Za-zÀ-ÿ'’.\-\s]{2,28})\s+([\u3400-\u9fff]{2,8})\s+(.{2,80})$/);
       if (mixedAreaMatch) {
         return {
@@ -1123,6 +1141,54 @@
         .split(/[。.!！?？]/)[0]
         .replace(/[：:，,\s]+$/g, "")
         .trim();
+    }
+
+    function stripLineMarker(line) {
+      return String(line || "")
+        .replace(/^\s*(?:[0-9一二三四五六七八九十]+(?:\uFE0F?\u20E3)?|🔟)\s*/, "")
+        .replace(/^\s*[\d一二三四五六七八九十]+[.)、．-]\s*/, "")
+        .replace(/^\s*[#*•·\-–—|｜>]+\s*/, "")
+        .replace(/^\s*[^\dA-Za-zÀ-ÿ\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af\s]+\s*/, "")
+        .trim();
+    }
+
+    function hasEmojiMarker(line) {
+      return startsWithMarker(line) || /(?:\d+\uFE0F?\u20E3|🔟)/.test(String(line || ""));
+    }
+
+    function hasPlaceNameShape(title) {
+      const text = String(title || "").trim();
+      if (!text) return false;
+      if (/^[A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{2,42}$/.test(text) && text.split(/\s+/).length <= 6) return true;
+      return /(?:咖啡|珈琲|餐厅|飯店|饭店|小馆|房|面包店|书店|商店|市場|市场|美术馆|博物馆|神社|大社|日沉宫|寺|城|峡|島|岛|松岛|公园|花园|广场|喷泉|阶梯|要塞|灯塔|温泉|温泉街|站|车站|总站|停车场|案内所|alley|Alley|Gate|Point|Fountain|Stairs|Gelato|Bakery|Cafe|Café|Coffee|bread|stories|Store|Market)$/i.test(text);
+    }
+
+    function scorePoiCandidate(title, line, nextLine = "", startsBlock = true) {
+      const text = String(title || "").trim();
+      if (!text) return -10;
+      let score = 0;
+      if (text.length <= 28) score += 2;
+      if (text.length <= 16) score += 1;
+      if (hasPlaceNameShape(text)) score += 4;
+      if (/^[A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{2,42}$/.test(text)) score += 2;
+      if (hasEmojiMarker(line)) score += 1;
+      if (/^(?:\d+\uFE0F?\u20E3|🔟|\d+[.)、．-])/.test(String(line || "").trim())) score += 1;
+      if (startsBlock) score += 1;
+      if (nextLine && !isNoiseLine(nextLine) && !startsWithMarker(nextLine)) score += 1;
+      if (looksLikeSentence(text)) score -= 6;
+      if (text.length > 42) score -= 8;
+      if (/(?:不用|可以|建议|提前|特别|很多|随便|直接|完全|真的|感觉|时候|这里|里面|路线|记录一下)/.test(text)) score -= 4;
+      return score;
+    }
+
+    function isSuspiciousPoiCandidate(group) {
+      const title = refinePoiTitle(group?.title || "");
+      const description = (group?.lines || []).join("。");
+      if (!title) return true;
+      if (title.length > 42 || looksLikeSentence(title)) return true;
+      if (/(?:不用|可以|建议|提前|特别|很多|随便|直接|完全|真的|感觉|时候|这里|里面|路线|记录一下)/.test(title)) return true;
+      const score = scorePoiCandidate(title, group.rawLine || title, description || "", true);
+      return score < 3;
     }
 
     function titleFromPoiLine(line) {
@@ -1165,7 +1231,9 @@
       if (/^\d{2,}\s+[A-ZÀ-Þ]/.test(String(title || "").trim())) {
         return String(title || "").trim();
       }
-      return cleanPoiName(title)
+      const cleaned = cleanPoiName(title);
+      if (/站前$/.test(cleaned)) return cleaned;
+      return cleaned
         .replace(/^(JR\s*[^站]{1,12}站).*$/i, "$1")
         .replace(/^([^站\s]{2,8}站).+$/i, "$1")
         .trim();
@@ -1251,10 +1319,19 @@
     function normalizeTravelMentionTitle(title) {
       const rawTitle = String(title || "").trim();
       let text = (/^\d{2,}\s+[A-ZÀ-Þ]/.test(rawTitle) ? rawTitle : cleanPoiName(rawTitle))
+        .replace(/^图[一二三四五六七八九十\d]+(?:[-—~至到和、]\s*[一二三四五六七八九十\d]+)?\s*/i, "")
+        .replace(/^图[一二三四五六七八九十\d]+的\s*/i, "")
+        .replace(/^Day\s*\d+\s+.*?(?=[\u3400-\u9fffA-Za-zÀ-ÿ0-9'’&.\-\s]{2,24}(?:咖啡|餐厅|面包店|书店|商店|美术馆|博物馆|神社|寺|城|峡|島|岛|公园|花园|广场|喷泉|阶梯|要塞|灯塔|温泉|温泉街|站|alley|Alley|Gate|Point|Fountain|Stairs|Gelato|Bakery|Cafe|Café|Coffee|bread|stories|Store|Market)$)/i, "")
+        .replace(/^(?:沉浸式体验|懒人友好的|小众艺术区散步)/, "")
+        .replace(/^吃了([\u3400-\u9fffA-Za-zÀ-ÿ0-9'’&.\-\s]{2,16})的.+$/, "$1")
+        .replace(/^.*(?:到了|到|去往了|去往|会经过|经过|上|回去|走去|再走去|来到|往|吃了)(?:图[一二三四五六七八九十\d]+的)?(?=[\u3400-\u9fffA-Za-zÀ-ÿ0-9'’&.\-\s]{2,32}(?:咖啡|餐厅|面包店|书店|商店|美术馆|博物馆|神社|大社|日沉宫|寺|城|峡|島|岛|松岛|公园|花园|广场|喷泉|阶梯|要塞|灯塔|温泉|温泉街|站|车站|总站|停车场|案内所|房)$)/, "")
+        .replace(/^.*(?:顺路逛个|逛个|打卡|直奔|比较热门的|分)(?=[\u3400-\u9fffA-Za-zÀ-ÿ0-9'’&.\-\s]{2,32}(?:咖啡|餐厅|面包店|书店|商店|美术馆|博物馆|神社|寺|城|峡|岛|公园|花园|广场|喷泉|阶梯|要塞|温泉|温泉街|alley|Alley|Gate|Point|Fountain|Stairs|Gelato|Bakery|Cafe|Café|Coffee|bread|stories|Store|Market)$)/, "")
+        .replace(/^.*?(?=[A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{2,42}(?:Gate|Point|Fountain|Stairs|Gelato|Bakery|Cafe|Café|Coffee|stories|bread|Alley|Store|Market)$)/, "")
         .replace(/^(?:上午|中午|下午|晚上|早上|傍晚|夜晚)\s*[（(]?\s*/, "")
+        .replace(/^(?:了|就是|也就是|到了|到|去往了|去往|往|经过|上|回到|回去|坐上去|走去|再走去|来到|吃了|选择再走去)\s*/, "")
         .replace(/[）)]$/, "")
-        .replace(/(?:的)?(?:正确打开方式|夜景|路线|一日路线|打卡地|打卡项目|限定)$，?$/i, "")
-        .replace(/^(?:直接|顺路|逛个|逛|泡个|找家|报了|从|在|去|到|来到|直奔)\s*/, "")
+        .replace(/(?:附近|外|里|里的|上|的)?(?:正确打开方式|夜景|路线|一日路线|打卡地|打卡项目|限定|巴士|海胆饭|散散步|下车|旧址|出来|走就是了|就是了|走)$，?$/i, "")
+        .replace(/^(?:直接|顺路|逛个|逛|泡个|找家|报了|从|在|去|到|来到|直奔|终于)\s*/, "")
         .replace(/\s+/g, " ")
         .trim();
 
@@ -1279,7 +1356,9 @@
       if (!text || text.length < 2 || text.length > 42) return "";
       if (/^(?:Day\d+|Part\d+|友情提示|当天往返|第二天|这里|里面|一楼|二楼|全都|Klook|Google Map)$/i.test(text)) return "";
       if (/^(?:View Point)$/i.test(text)) return "";
-      if (/(?:不用查|不用赶|提前|现场|可以|建议|随便|特别舒服|拍都是|一定要|真的会|完全不|左右|距离|记录一下|小众艺术区散步)/.test(text)) return "";
+      if (/^(?:餐厅|商店|要塞|咖啡店|面包店|书店|温泉街|老城|老城区|漂亮面包店|车站|神社|灯塔|停车场|巴士停车站|安内所)$/.test(text)) return "";
+      if (/^(?:买了|返|作为|但|整条|绝对|餐厅和|商店很多|漂亮|辽阔|古朴|很多|整个|最后我|电车里|之后就是)/.test(text)) return "";
+      if (/(?:不用查|不用赶|提前|现场|可以|建议|随便|特别舒服|拍都是|一定要|真的会|完全不|左右|距离|记录一下|小众艺术区散步|亲手|整个老城|理论上|时间|想着|想象|选择|便宜|很大|价格|小时|车程|大概)/.test(text)) return "";
       return text;
     }
 
@@ -1295,8 +1374,10 @@
         const cleaned = normalizeTravelMentionTitle(title);
         const key = cleaned.toLowerCase();
         if (!cleaned || seen.has(key)) return;
+        const rawLine = detail || title;
+        const suspicious = scorePoiCandidate(cleaned, rawLine, "", true) < 3 || looksLikeSentence(cleaned);
         seen.add(key);
-        groups.push({ title: cleaned, area, lines: [detail].filter(Boolean) });
+        groups.push({ title: cleaned, area, lines: [detail].filter(Boolean), rawLine, suspicious });
       }
 
       for (const line of lines) {
@@ -1324,8 +1405,13 @@
 
       const normalized = lines.join(" ");
       const inlinePatterns = [
-        /(高千穗峡|草千里|阿苏神社|黑川温泉|熊本城|北浜\s*alley|古城墙和要塞|古城和黑水湾|Pile Gate|Onofrio喷泉|Jesuit阶梯|Fort Lovrijenac|View Point of Dubrovnik|Viewpoint of Dubrovnik|Peppino’s Gelato|Peppino's Gelato|Umie|iam with bread|kitahama blue stories|element|206 TSU MA MU)/gi,
-        /(?:📍\s*)?([A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{2,42}(?:Gate|Point|Fountain|Stairs|Gelato|stories|bread|Alley))/g
+        /[（(]([^）)]{2,80})[）)]/g,
+        /(?:到了|到|去往了|去往|往|会经过|经过|来到|回到|回去|走去|再走去|坐上去|上|吃了)\s*(?:图[一二三四五六七八九十\d]+的)?([A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{2,42}|[\u3400-\u9fffA-Za-zÀ-ÿ0-9'’&.\-\s]{1,24}(?:咖啡|餐厅|面包店|书店|商店|美术馆|博物馆|神社|大社|日沉宫|寺|城|峡|島|岛|松岛|公园|花园|广场|喷泉|阶梯|要塞|灯塔|温泉|温泉街|站|车站|总站|停车场|案内所|房))\s*(?:的|附近|外|里|上|下车|散步|走|逛|打卡|吃|喝|泡|，|,|。|！|!|；|;|$)/gi,
+        /(?:从|靠近|位于)\s*([A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{2,42}|[\u3400-\u9fffA-Za-zÀ-ÿ0-9'’&.\-\s]{2,24}(?:咖啡|餐厅|面包店|书店|商店|美术馆|博物馆|神社|大社|日沉宫|寺|城|峡|岛|松岛|公园|花园|广场|喷泉|阶梯|要塞|灯塔|温泉|温泉街|车站|总站|停车场|案内所|房))\s*(?:的|进入|出来|出发|散步|逛|打卡|吃|喝|泡|，|,|。|！|!|；|;|$)/gi,
+        /往(?!返)\s*([^，,。.!！?？…]{2,48}?)(?:走|就是|，|,|。|！|!|；|;|$)/g,
+        /(?:📍\s*)?([A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{2,42}(?:Gate|Point|Fountain|Stairs|Gelato|Bakery|stories|bread|Alley|Store|Market))/g,
+        /([\u3400-\u9fffA-Za-zÀ-ÿ0-9'’&.\-\s]{2,24}(?:alley|Alley))/g,
+        /([\u3400-\u9fffA-Za-zÀ-ÿ0-9'’&.\-\s]{1,24}(?:美术馆|博物馆|神社|大社|日沉宫|寺|峡|島|岛|松岛|公园|花园|广场|喷泉|阶梯|要塞|灯塔|温泉|温泉街))/g
       ];
 
       for (const pattern of inlinePatterns) {
@@ -1334,7 +1420,14 @@
         while ((match = pattern.exec(normalized))) {
           const start = Math.max(0, match.index - 50);
           const end = Math.min(normalized.length, match.index + match[0].length + 90);
-          add(match[1], normalized.slice(start, end).trim());
+          const candidates = String(match[1] || "")
+            .split(/[、，,/／]|或者/)
+            .map((item) => item.trim())
+            .filter(Boolean);
+          for (const candidate of candidates) {
+            if (/图\d|图[一二三四五六七八九十]/.test(candidate)) continue;
+            add(candidate, normalized.slice(start, end).trim());
+          }
         }
       }
 
@@ -1540,14 +1633,14 @@
       if (isDayHeader(raw)) return false;
       if (isAddressLine(raw)) return false;
       if (parseDetailLine(raw)) return false;
-      if (/^(?:\s*(?:[0-9一二三四五六七八九十]+(?:\uFE0F?\u20E3)|🔟)\s*)+\S+/.test(raw)) return true;
-      if (/^[\d一二三四五六七八九十]+[.)、．-]\s*\S+/.test(raw)) return true;
-      if (/^[#*•·\-–—|｜>]/.test(raw)) return true;
+      if (/^(?:\s*(?:[0-9一二三四五六七八九十]+(?:\uFE0F?\u20E3)|🔟)\s*)+\S+/.test(raw)) return scorePoiCandidate(titleFromPoiLine(raw), raw) >= 3;
+      if (/^[\d一二三四五六七八九十]+[.)、．-]\s*\S+/.test(raw)) return scorePoiCandidate(titleFromPoiLine(raw), raw) >= 3;
+      if (/^[#*•·\-–—|｜>]/.test(raw)) return scorePoiCandidate(titleFromPoiLine(raw), raw) >= 3;
       if (startsWithMarker(raw)) {
         if (looksLikeSentence(cleaned)) return false;
         if (/(路线|记录一下|小众艺术区散步|一日路线)/.test(cleaned)) return false;
         if (/(很多|有点|不怎么|可以|看到|坐拥|满满|不用|随处|特别|可能|期待值)/.test(cleaned)) return false;
-        return true;
+        return scorePoiCandidate(titleFromPoiLine(raw), raw) >= 3;
       }
       if (/^[A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]+$/.test(cleaned) && cleaned.split(/\s+/).length <= 6) return true;
       return false;
@@ -1557,7 +1650,9 @@
       const lower = text.toLowerCase();
       if (/^(?:渔人码头|联合广场|唐人街|金门大桥|Lover's Point|Las Vegas Strip|Sphere Vista Point|威尼斯人)/i.test(text)) return "景点";
       if (/^(?:JR\s*児島站|瀨戶內海|濑户内海|瀬戸内海)/i.test(text)) return "景点";
+      if (/^[^\s]{2,28}(?:神社|大社|日沉宫|灯塔|松岛|島|岛|车站|JR站|总站|停车场)/.test(text)) return "景点";
       if (/^(?:高千穗峡|草千里|阿苏神社|黑川温泉|熊本城|古城墙和要塞|古城和黑水湾|Pile Gate|Onofrio Fountain|Jesuit Stairs|Fort Lovrijenac|View Point of Dubrovnik|Viewpoint of Dubrovnik|北浜\s*alley)/i.test(text)) return "景点";
+      if (/^花房(?:\s|$)/.test(text)) return "餐厅";
       if (/^(?:Peppino’s Gelato|Peppino's Gelato|iam with bread|206 TSU MA MU)/i.test(text)) return "餐厅";
       if (/^(?:Umie)/i.test(text)) return "咖啡";
       if (/^(?:kitahama blue stories|element)/i.test(text)) return "购物";
@@ -1678,13 +1773,13 @@
         const captionPoi = parseCaptionPoi(trimmed);
         if (pageSuffixPoi && pageSuffixPoi.title) {
           if (current) groups.push(current);
-          current = { title: pageSuffixPoi.title, area: pageSuffixPoi.area, lines: [] };
+          current = { title: pageSuffixPoi.title, area: pageSuffixPoi.area, lines: [], rawLine: trimmed };
         } else if (captionPoi && captionPoi.title) {
           if (current) groups.push(current);
-          current = { title: captionPoi.title, area: captionPoi.area, lines: captionPoi.detail ? [captionPoi.detail] : [] };
+          current = { title: captionPoi.title, area: captionPoi.area, lines: captionPoi.detail ? [captionPoi.detail] : [], rawLine: trimmed };
         } else if (isPoiTitle(trimmed) || isShortPoiCandidate(trimmed, nextLine, inListSection, startsBlock)) {
           if (current) groups.push(current);
-          current = { title: titleFromPoiLine(trimmed), lines: [] };
+          current = { title: titleFromPoiLine(trimmed), lines: [], rawLine: trimmed };
         } else if (current) {
           current.lines.push(trimmed);
         }
@@ -1732,7 +1827,8 @@
 
     function groupsToPois(groups, city) {
       return mergeDuplicateGroups(groups)
-        .filter((group) => group.title)
+        .map((group) => ({ ...group, suspicious: group.suspicious || isSuspiciousPoiCandidate(group) }))
+        .filter((group) => group.title && !group.suspicious)
         .map((group) => {
           const description = group.lines.join("。");
           const fullText = `${group.title} ${description}`;
