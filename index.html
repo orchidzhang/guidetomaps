@@ -1125,6 +1125,18 @@
         .trim();
     }
 
+    function titleFromPoiLine(line) {
+      const raw = String(line || "").trim();
+      const markerHeadingMatch = raw.match(/^(?:\s*(?:[0-9一二三四五六七八九十]+(?:\uFE0F?\u20E3)?|🔟)|\d+[.)、．-]|[^0-9A-Za-zÀ-ÿ\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af\s]).*?[（(]([^）)]{2,42})[）)]/);
+      if (markerHeadingMatch) return cleanPoiName(markerHeadingMatch[1]);
+      if (/^(?:\s*(?:[0-9一二三四五六七八九十]+(?:\uFE0F?\u20E3)?|🔟)|\d+[.)、．-]|[^0-9A-Za-zÀ-ÿ\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af\s])/.test(raw) && /[：:]/.test(raw)) {
+        const heading = raw.split(/[：:]/)[0];
+        const parenMatch = heading.match(/[（(]([^）)]{2,42})[）)]/);
+        return cleanPoiName(parenMatch ? parenMatch[1] : heading);
+      }
+      return cleanPoiName(raw);
+    }
+
     function mergeDuplicateGroups(groups) {
       const merged = [];
       const seen = new Map();
@@ -1150,6 +1162,9 @@
     }
 
     function refinePoiTitle(title) {
+      if (/^\d{2,}\s+[A-ZÀ-Þ]/.test(String(title || "").trim())) {
+        return String(title || "").trim();
+      }
       return cleanPoiName(title)
         .replace(/^(JR\s*[^站]{1,12}站).*$/i, "$1")
         .replace(/^([^站\s]{2,8}站).+$/i, "$1")
@@ -1212,8 +1227,7 @@
       const patterns = [
         /\b(Jeans Street)\b/gi,
         /\b(Cafe Japan Blue Garden)\b/gi,
-        /(JR\s*児島站)/gi,
-        /(瀨戶內海|濑户内海|瀬戸内海)/g
+        /(JR\s*児島站)/gi
       ];
       for (const pattern of patterns) {
         pattern.lastIndex = 0;
@@ -1231,6 +1245,99 @@
           });
         }
       }
+      return groups;
+    }
+
+    function normalizeTravelMentionTitle(title) {
+      const rawTitle = String(title || "").trim();
+      let text = (/^\d{2,}\s+[A-ZÀ-Þ]/.test(rawTitle) ? rawTitle : cleanPoiName(rawTitle))
+        .replace(/^(?:上午|中午|下午|晚上|早上|傍晚|夜晚)\s*[（(]?\s*/, "")
+        .replace(/[）)]$/, "")
+        .replace(/(?:的)?(?:正确打开方式|夜景|路线|一日路线|打卡地|打卡项目|限定)$，?$/i, "")
+        .replace(/^(?:直接|顺路|逛个|逛|泡个|找家|报了|从|在|去|到|来到|直奔)\s*/, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      const aliases = {
+        "Viewpoint of Dubrovnik": "View Point of Dubrovnik",
+        "View Point of Dubrovnik P5": "View Point of Dubrovnik",
+        "Pile Gate进入": "Pile Gate",
+        "Onofrio喷泉": "Onofrio Fountain",
+        "Jesuit阶梯": "Jesuit Stairs",
+        "权利的游戏": "",
+        "权游纪念品商店": ""
+      };
+      const aliasKey = Object.keys(aliases).find((item) => item.toLowerCase() === text.toLowerCase());
+      if (aliasKey) text = aliases[aliasKey];
+
+      text = text
+        .replace(/\s*P\d+(?:\s*[-—~至到和、]\s*\d+)?\s*$/i, "")
+        .replace(/[：:，,。.!！?？].*$/, "")
+        .replace(/^(?:店叫|叫|一家店叫|有一家店叫)/, "")
+        .trim();
+
+      if (!text || text.length < 2 || text.length > 42) return "";
+      if (/^(?:Day\d+|Part\d+|友情提示|当天往返|第二天|这里|里面|一楼|二楼|全都|Klook|Google Map)$/i.test(text)) return "";
+      if (/^(?:View Point)$/i.test(text)) return "";
+      if (/(?:不用查|不用赶|提前|现场|可以|建议|随便|特别舒服|拍都是|一定要|真的会|完全不|左右|距离|记录一下|小众艺术区散步)/.test(text)) return "";
+      return text;
+    }
+
+    function appendTravelMentions(groups, text, city) {
+      const seen = new Set(groups.map((group) => normalizeTravelMentionTitle(group.title).toLowerCase()).filter(Boolean));
+      const lines = text
+        .replace(/\[[#＃][^\]]+\]\(https?:\/\/[^\)]+\)/g, "")
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean);
+
+      function add(title, detail, area = city.trim()) {
+        const cleaned = normalizeTravelMentionTitle(title);
+        const key = cleaned.toLowerCase();
+        if (!cleaned || seen.has(key)) return;
+        seen.add(key);
+        groups.push({ title: cleaned, area, lines: [detail].filter(Boolean) });
+      }
+
+      for (const line of lines) {
+        let match = line.match(/^✔️?\s*(?:上午|中午|下午|晚上|早上|傍晚)?\s*[（(]([^）)]{2,42})[）)]\s*[：:，,]?\s*(.*)$/);
+        if (match) add(match[1], match[2] || line);
+
+        match = line.match(/^(?:\d+\uFE0F?\u20E3|🔟|\d+[.)、．-])\s*([^：:，,。.!！?？]{2,42})[：:，,]\s*(.*)$/);
+        if (match) add(match[1], match[2] || line);
+
+        match = line.match(/^([^：:，,。.!！?？]{2,34}(?:城墙和要塞|古城和黑水湾|温泉街|alley|Alley|峡|神社|温泉|城|要塞|喷泉|阶梯|Gate|Point|Fountain|Stairs))\s*[：:，,]\s*(.*)$/i);
+        if (match) add(match[1], match[2] || line);
+
+        match = line.match(/^[🚣🍜☀️🇯🇵\s]*([A-Za-zÀ-ÿ\u3400-\u9fff][A-Za-zÀ-ÿ0-9'’&.\-\s\u3400-\u9fff]{1,32}(?:峡|神社|温泉|温泉街|城|alley|Alley|Gate|Point))的/);
+        if (match) add(match[1], line);
+
+        match = line.match(/(?:有一家店叫|店叫|叫|比较热门的)\s*[“"']?([A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{2,42})[”"']?/);
+        if (match) add(match[1], line);
+
+        match = line.match(/^✔️?\s*(\d{2,}\s+[A-Za-zÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{2,42})\s*[：:，,]/);
+        if (match) add(match[1], line);
+
+        match = line.match(/^✔️?\s*([A-Za-zÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{2,42})\s*[：:，,]/);
+        if (match) add(match[1], line);
+      }
+
+      const normalized = lines.join(" ");
+      const inlinePatterns = [
+        /(高千穗峡|草千里|阿苏神社|黑川温泉|熊本城|北浜\s*alley|古城墙和要塞|古城和黑水湾|Pile Gate|Onofrio喷泉|Jesuit阶梯|Fort Lovrijenac|View Point of Dubrovnik|Viewpoint of Dubrovnik|Peppino’s Gelato|Peppino's Gelato|Umie|iam with bread|kitahama blue stories|element|206 TSU MA MU)/gi,
+        /(?:📍\s*)?([A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{2,42}(?:Gate|Point|Fountain|Stairs|Gelato|stories|bread|Alley))/g
+      ];
+
+      for (const pattern of inlinePatterns) {
+        pattern.lastIndex = 0;
+        let match;
+        while ((match = pattern.exec(normalized))) {
+          const start = Math.max(0, match.index - 50);
+          const end = Math.min(normalized.length, match.index + match[0].length + 90);
+          add(match[1], normalized.slice(start, end).trim());
+        }
+      }
+
       return groups;
     }
 
@@ -1430,6 +1537,7 @@
       const raw = line.trim();
       const cleaned = cleanPoiName(raw);
       if (!cleaned || cleaned.length > 54) return false;
+      if (isDayHeader(raw)) return false;
       if (isAddressLine(raw)) return false;
       if (parseDetailLine(raw)) return false;
       if (/^(?:\s*(?:[0-9一二三四五六七八九十]+(?:\uFE0F?\u20E3)|🔟)\s*)+\S+/.test(raw)) return true;
@@ -1437,6 +1545,7 @@
       if (/^[#*•·\-–—|｜>]/.test(raw)) return true;
       if (startsWithMarker(raw)) {
         if (looksLikeSentence(cleaned)) return false;
+        if (/(路线|记录一下|小众艺术区散步|一日路线)/.test(cleaned)) return false;
         if (/(很多|有点|不怎么|可以|看到|坐拥|满满|不用|随处|特别|可能|期待值)/.test(cleaned)) return false;
         return true;
       }
@@ -1448,6 +1557,10 @@
       const lower = text.toLowerCase();
       if (/^(?:渔人码头|联合广场|唐人街|金门大桥|Lover's Point|Las Vegas Strip|Sphere Vista Point|威尼斯人)/i.test(text)) return "景点";
       if (/^(?:JR\s*児島站|瀨戶內海|濑户内海|瀬戸内海)/i.test(text)) return "景点";
+      if (/^(?:高千穗峡|草千里|阿苏神社|黑川温泉|熊本城|古城墙和要塞|古城和黑水湾|Pile Gate|Onofrio Fountain|Jesuit Stairs|Fort Lovrijenac|View Point of Dubrovnik|Viewpoint of Dubrovnik|北浜\s*alley)/i.test(text)) return "景点";
+      if (/^(?:Peppino’s Gelato|Peppino's Gelato|iam with bread|206 TSU MA MU)/i.test(text)) return "餐厅";
+      if (/^(?:Umie)/i.test(text)) return "咖啡";
+      if (/^(?:kitahama blue stories|element)/i.test(text)) return "购物";
       if (/^Jeans Street/i.test(text)) return "购物";
       if (/^.{0,30}(珈琲|咖啡|cafe|café|coffee)/i.test(text)) return "咖啡";
       if (/(面包店|面包|吐司|可颂|法棍|🥯|🥖|🍞|🥐|bakery|bread)/i.test(lower)) return "餐厅";
@@ -1467,7 +1580,9 @@
             .replace(/附近$/, "")
             .replace(/[，,。.!！?？].*$/, "")
             .trim();
-          if (/^(从|因为|这次|今天|昨天|后来|可以|几乎|所有|主要|点餐|支付|国内|带了|昨天后来)/.test(area)) continue;
+          if (/^(从|但|因为|这次|今天|昨天|后来|可以|几乎|所有|主要|点餐|支付|国内|带了|昨天后来)/.test(area)) continue;
+          if (/^(?:沿着|踩着|整条|当天往返|还有|高松逛街)/.test(area)) continue;
+          if (/(?:主路|石板路|温泉街|古早街|小众艺术区)$/.test(area)) continue;
           if (area.length > 18 || /小城/.test(area)) continue;
           if (/Jeans Street/i.test(area) || /^(?:車站|车站)$/.test(area)) continue;
           if (/(周边|指路|下单|回忆|社区)$/.test(area) || /^(但和|店内|时髦社区|友指路)/.test(area)) continue;
@@ -1569,7 +1684,7 @@
           current = { title: captionPoi.title, area: captionPoi.area, lines: captionPoi.detail ? [captionPoi.detail] : [] };
         } else if (isPoiTitle(trimmed) || isShortPoiCandidate(trimmed, nextLine, inListSection, startsBlock)) {
           if (current) groups.push(current);
-          current = { title: cleanPoiName(trimmed), lines: [] };
+          current = { title: titleFromPoiLine(trimmed), lines: [] };
         } else if (current) {
           current.lines.push(trimmed);
         }
@@ -1587,6 +1702,8 @@
           });
         }
       }
+
+      appendTravelMentions(groups, text, city);
 
       if (!groups.length) {
         groups.push(...parseEmbeddedPois(text, city));
