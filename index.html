@@ -267,6 +267,7 @@
 
     .result-panel {
       padding: 16px;
+      position: relative;
     }
 
     .result-toolbar {
@@ -648,7 +649,7 @@
 
       .app {
         width: 100%;
-        padding: 28px 12px 26px;
+        padding: 22px 10px 22px;
       }
 
       h1 {
@@ -661,27 +662,105 @@
 
       .input-panel,
       .result-panel {
-        padding: 14px;
+        padding: 16px;
       }
 
       textarea {
         min-height: 220px;
       }
 
-      .actions,
+      .result-toolbar {
+        gap: 14px;
+        margin-bottom: 10px;
+      }
+
+      .result-title {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+      }
+
+      .result-heading {
+        font-size: 28px;
+      }
+
       .toolbar-actions {
-        grid-template-columns: 1fr;
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+        width: 100%;
+      }
+
+      .tool-btn {
+        min-height: 46px;
+        padding: 6px 4px;
+        border: 1px solid var(--line);
+        background: #fff;
+        font-size: 11px;
+        border-radius: 12px;
+      }
+
+      .tool-icon {
+        font-size: 18px;
+      }
+
+      .count {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        min-width: 34px;
+      }
+
+      .actions {
+        grid-template-columns: 1fr 1fr;
       }
 
       .btn,
-      .map-link,
       .btn.icon {
         width: 100%;
       }
 
+      .place-card {
+        gap: 14px;
+        padding: 18px 0;
+      }
+
+      .place-head {
+        align-items: start;
+        gap: 8px;
+      }
+
+      .place-name input {
+        font-size: 22px;
+      }
+
+      .place-meta,
+      .place-area input,
+      .place-card textarea {
+        font-size: 15px;
+      }
+
       .place-actions {
         display: grid;
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        align-self: stretch;
+      }
+
+      .map-link {
+        grid-column: 1 / -1;
+        min-height: 54px;
+        padding: 10px 14px;
+        flex-direction: row;
+        gap: 8px;
+        font-size: 16px;
+      }
+
+      .place-copy,
+      .place-delete {
+        min-height: 44px;
+        font-size: 19px;
       }
 
       .field-head {
@@ -757,8 +836,8 @@
       ["咖啡", ["咖啡", "珈琲", "☕", "cafe", "café", "coffee", "拿铁", "烘焙", "甜品"]],
       ["餐厅", ["餐厅", "饭店", "食堂", "小馆", "麦当劳", "早餐", "朝ごはん", "橙汁", "果汁", "面包店", "面包", "吐司", "可颂", "法棍", "🥯", "🥖", "🍞", "🥐", "🌭", "排骨", "章鱼", "菜包肉", "牛排", "鱼饼", "米饭", "拼盘", "吃饭", "用餐", "bakery", "bread", "brunch", "bistro", "bistrò", "restaurant", "diner", "osteria", "pizzeria", "trattoria", "pizza", "grill", "料理", "午餐", "晚餐", "酒吧", "bar"]],
       ["酒店", ["酒店", "hotel", "民宿", "住宿", "旅馆", "resort"]],
-      ["购物", ["购物", "商场", "百货", "买手店", "古着", "书店", "市集", "伴手礼", "纪念品", "九谷烧", "器物", "清酒杯", "茶杯", "花瓶", "工厂店", "百丽宫", "ABC Store", "montbell", "market", "boutique", "shop"]],
-      ["景点", ["景点", "博物馆", "美术馆", "小巷", "石阶", "公园", "花园", "教堂", "神社", "寺", "城", "岛", "宫", "塔", "广场", "温泉", "金门大桥", "Lover's Point", "Las Vegas Strip", "Sphere Vista Point", "威尼斯人", "museum", "garden"]]
+      ["购物", ["购物", "商场", "百货", "买手店", "古着", "书店", "市集", "伴手礼", "纪念品", "九谷烧", "器物", "清酒杯", "茶杯", "花瓶", "工厂店", "百丽宫", "丹寧", "牛仔", "牛仔褲", "Jeans Street", "ABC Store", "montbell", "market", "boutique", "shop"]],
+      ["景点", ["景点", "博物馆", "美术馆", "小巷", "石阶", "公园", "花园", "教堂", "神社", "寺", "城", "岛", "島", "海", "宮", "宫", "塔", "广场", "廣場", "温泉", "金门大桥", "Lover's Point", "Las Vegas Strip", "Sphere Vista Point", "威尼斯人", "museum", "garden"]]
     ];
     const AREA_PATTERNS = [
       /(Châtelet\s*-\s*Les Halles|Rue Saint-Honoré|Marais|Le Marais|Shibuya|Shinjuku|Ginza|Harajuku|Montmartre|Louvre)/i,
@@ -897,25 +976,39 @@
     function mergeDuplicateGroups(groups) {
       const merged = [];
       const seen = new Map();
+      const seenByTitle = new Map();
       for (const group of groups) {
-        const key = `${group.title || ""}__${group.area || ""}`.toLowerCase();
-        if (seen.has(key)) {
-          const existing = seen.get(key);
+        group.title = refinePoiTitle(group.title || "");
+        if (!group.title) continue;
+        const titleKey = group.title.replace(/\s+/g, " ").trim().toLowerCase();
+        const areaKey = (group.area || "").replace(/\s+/g, " ").trim().toLowerCase();
+        const key = `${titleKey}__${areaKey}`;
+        const existing = seen.get(key) || seenByTitle.get(titleKey);
+        if (existing) {
+          if (!existing.area && group.area) existing.area = group.area;
           existing.lines.push(...(group.lines || []));
         } else {
           const next = { ...group, lines: [...(group.lines || [])] };
           seen.set(key, next);
+          seenByTitle.set(titleKey, next);
           merged.push(next);
         }
       }
       return merged;
     }
 
+    function refinePoiTitle(title) {
+      return cleanPoiName(title)
+        .replace(/^(JR\s*[^站]{1,12}站).*$/i, "$1")
+        .replace(/^([^站\s]{2,8}站).+$/i, "$1")
+        .trim();
+    }
+
     function parseInlinePoi(line) {
       const text = line.trim();
       const patterns = [
         /(?:店名|餐厅|咖啡店|咖啡馆|cafe|café|restaurant|bakery|bistro|branch)\s*(?:叫|是|为|:|：)\s*([A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{2,50})(?:[（(]|，|,|。|\.|！|!|；|;|$)/i,
-        /(?:有家|一家|这家|附近有家)\s*(?:view很棒的|海景|宝藏|不错的|很棒的)?\s*(?:cafe|café|咖啡店|咖啡馆|餐厅|面包店|bakery)?\s*[:：]?\s*([A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{2,50})(?:[（(]|，|,|。|\.|！|!|；|;|$)/i
+        /(?:有家|一家|这家|附近有家|來到|来到)\s*(?:view很棒的|海景|宝藏|不錯的|不错的|很棒的)?\s*(?:cafe|café|咖啡店|咖啡馆|餐厅|面包店|bakery)?\s*[:：]?\s*([A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{2,50})(?:一定|[（(]|，|,|。|\.|！|!|；|;|$)/i
       ];
 
       for (const pattern of patterns) {
@@ -929,7 +1022,7 @@
     }
 
     function normalizeEmbeddedPoiTitle(title) {
-      let text = cleanPoiName(title)
+      let text = refinePoiTitle(title)
         .replace(/^(?:超大|大型|这座|整座|一座|一家|这家|很多很多|很多|整个|雨后傍晚的整个)/, "")
         .replace(/^(?:雨中(?:的)?|雨后(?:的)?|傍晚(?:的)?|荒郊野岭(?:的)?)/, "")
         .replace(/^(?:边上的|附近的|旁边的)/, "")
@@ -957,6 +1050,36 @@
       if (/^(?:人生背包|电车小城|油屋原型|上岛|坐船上岛|可以上岛|一个站|站|温泉街)$/.test(text)) return "";
       if (/坐船|不敢|可以|本来|结果|直接|荒郊野岭/.test(text)) return "";
       return text;
+    }
+
+    function appendInlinePois(groups, text, city) {
+      const seen = new Set(groups.map((group) => group.title));
+      const normalized = text
+        .replace(/\[[#＃][^\]]+\]\(https?:\/\/[^\)]+\)/g, "")
+        .replace(/\s+/g, " ");
+      const patterns = [
+        /\b(Jeans Street)\b/gi,
+        /\b(Cafe Japan Blue Garden)\b/gi,
+        /(JR\s*児島站)/gi,
+        /(瀨戶內海|濑户内海|瀬戸内海)/g
+      ];
+      for (const pattern of patterns) {
+        pattern.lastIndex = 0;
+        let match;
+        while ((match = pattern.exec(normalized))) {
+          const title = normalizeEmbeddedPoiTitle(match[1]);
+          if (!title || seen.has(title)) continue;
+          const start = Math.max(0, match.index - 45);
+          const end = Math.min(normalized.length, match.index + match[0].length + 80);
+          seen.add(title);
+          groups.push({
+            title,
+            area: city.trim(),
+            lines: [normalized.slice(start, end).trim()]
+          });
+        }
+      }
+      return groups;
     }
 
     function parseEmbeddedPois(text, city) {
@@ -1172,6 +1295,8 @@
     function classifyType(text) {
       const lower = text.toLowerCase();
       if (/^(?:渔人码头|联合广场|唐人街|金门大桥|Lover's Point|Las Vegas Strip|Sphere Vista Point|威尼斯人)/i.test(text)) return "景点";
+      if (/^(?:JR\s*児島站|瀨戶內海|濑户内海|瀬戸内海)/i.test(text)) return "景点";
+      if (/^Jeans Street/i.test(text)) return "购物";
       if (/^.{0,30}(珈琲|咖啡|cafe|café|coffee)/i.test(text)) return "咖啡";
       if (/(面包店|面包|吐司|可颂|法棍|🥯|🥖|🍞|🥐|bakery|bread)/i.test(lower)) return "餐厅";
       for (const [type, words] of TYPE_KEYWORDS) {
@@ -1192,6 +1317,7 @@
             .trim();
           if (/^(从|因为|这次|今天|昨天|后来|可以|几乎|所有|主要|点餐|支付|国内|带了|昨天后来)/.test(area)) continue;
           if (area.length > 18 || /小城/.test(area)) continue;
+          if (/Jeans Street/i.test(area) || /^(?:車站|车站)$/.test(area)) continue;
           if (/(周边|指路|下单|回忆|社区)$/.test(area) || /^(但和|店内|时髦社区|友指路)/.test(area)) continue;
           if (area && city && !area.toLowerCase().includes(city.toLowerCase())) return `${area} / ${city}`;
           if (area) return area;
@@ -1294,6 +1420,7 @@
         startsBlock = false;
       }
       if (current) groups.push(current);
+      appendInlinePois(groups, text, city);
 
       if (!groups.length) {
         const inlineTitle = parseInlinePoi(text);
