@@ -755,10 +755,10 @@
     const TYPES = ["咖啡", "餐厅", "景点", "酒店", "购物", "其他"];
     const TYPE_KEYWORDS = [
       ["咖啡", ["咖啡", "珈琲", "☕", "cafe", "café", "coffee", "拿铁", "烘焙", "甜品"]],
-      ["餐厅", ["餐厅", "饭店", "食堂", "早餐", "朝ごはん", "橙汁", "果汁", "面包店", "面包", "吐司", "可颂", "法棍", "🥯", "🥖", "🍞", "🥐", "🌭", "排骨", "章鱼", "菜包肉", "牛排", "鱼饼", "米饭", "拼盘", "bakery", "bread", "brunch", "bistro", "bistrò", "restaurant", "diner", "osteria", "pizzeria", "trattoria", "pizza", "grill", "料理", "午餐", "晚餐", "酒吧", "bar"]],
+      ["餐厅", ["餐厅", "饭店", "食堂", "小馆", "麦当劳", "早餐", "朝ごはん", "橙汁", "果汁", "面包店", "面包", "吐司", "可颂", "法棍", "🥯", "🥖", "🍞", "🥐", "🌭", "排骨", "章鱼", "菜包肉", "牛排", "鱼饼", "米饭", "拼盘", "吃饭", "用餐", "bakery", "bread", "brunch", "bistro", "bistrò", "restaurant", "diner", "osteria", "pizzeria", "trattoria", "pizza", "grill", "料理", "午餐", "晚餐", "酒吧", "bar"]],
       ["酒店", ["酒店", "hotel", "民宿", "住宿", "旅馆", "resort"]],
-      ["购物", ["购物", "商场", "百货", "买手店", "古着", "书店", "市集", "伴手礼", "纪念品", "九谷烧", "器物", "清酒杯", "茶杯", "花瓶", "market", "boutique", "shop"]],
-      ["景点", ["景点", "博物馆", "美术馆", "小巷", "石阶", "公园", "花园", "教堂", "神社", "寺", "宫", "塔", "广场", "museum", "garden"]]
+      ["购物", ["购物", "商场", "百货", "买手店", "古着", "书店", "市集", "伴手礼", "纪念品", "九谷烧", "器物", "清酒杯", "茶杯", "花瓶", "工厂店", "百丽宫", "ABC Store", "montbell", "market", "boutique", "shop"]],
+      ["景点", ["景点", "博物馆", "美术馆", "小巷", "石阶", "公园", "花园", "教堂", "神社", "寺", "城", "岛", "宫", "塔", "广场", "温泉", "金门大桥", "Lover's Point", "Las Vegas Strip", "Sphere Vista Point", "威尼斯人", "museum", "garden"]]
     ];
     const AREA_PATTERNS = [
       /(Châtelet\s*-\s*Les Halles|Rue Saint-Honoré|Marais|Le Marais|Shibuya|Shinjuku|Ginza|Harajuku|Montmartre|Louvre)/i,
@@ -928,6 +928,212 @@
       return "";
     }
 
+    function normalizeEmbeddedPoiTitle(title) {
+      let text = cleanPoiName(title)
+        .replace(/^(?:超大|大型|这座|整座|一座|一家|这家|很多很多|很多|整个|雨后傍晚的整个)/, "")
+        .replace(/^(?:雨中(?:的)?|雨后(?:的)?|傍晚(?:的)?|荒郊野岭(?:的)?)/, "")
+        .replace(/^(?:边上的|附近的|旁边的)/, "")
+        .trim();
+
+      const suffix = "(?:工厂店|温泉街|温泉|美术馆|博物馆|神社|案内所|车站|站|寺|城|岛|公园|花园|市场|商店|书店|买手店)";
+      const verbMatch = text.match(new RegExp(`(?:走到|回到|回|去了|去|到|在)([\\u3400-\\u9fffA-Za-z][\\u3400-\\u9fffA-Za-z0-9'’&.\\-\\s]*${suffix})$`));
+      if (verbMatch) text = verbMatch[1].trim();
+
+      const verbParts = text.split(/(?:走到|回到|来到|去了|去到|看到|回|去|到|在|就)/).map((part) => part.trim()).filter(Boolean);
+      const lastVerbPart = verbParts[verbParts.length - 1] || "";
+      if (lastVerbPart && new RegExp(`${suffix}$`).test(lastVerbPart)) text = lastVerbPart;
+
+      text = text
+        .replace(/^(?:超大|大型|这座|整座|一座|一家|这家)/, "")
+        .replace(/^(?:雨中(?:的)?|雨后(?:的)?|傍晚(?:的)?|荒郊野岭(?:的)?)/, "")
+        .replace(/^.*?的(?=[\u3400-\u9fffA-Za-z]{2,12}(?:站|公园|神社|寺|城|岛|温泉|案内所)$)/, "")
+        .replace(/^回(?=道后温泉)/, "")
+        .replace(/^(?:路上看到|看到|来到|去了|去到|到了|回到|走到|直接)/, "")
+        .replace(/^(?:倒是|然后|于是|终于|就是|已经是|还是可以|过了|一个)/, "")
+        .trim();
+
+      if (!text || text.length > 28) return "";
+      if (/(?:小城|整个天|原型)$/.test(text)) return "";
+      if (/^(?:人生背包|电车小城|油屋原型|上岛|坐船上岛|可以上岛|一个站|站|温泉街)$/.test(text)) return "";
+      if (/坐船|不敢|可以|本来|结果|直接|荒郊野岭/.test(text)) return "";
+      return text;
+    }
+
+    function parseEmbeddedPois(text, city) {
+      const normalized = text
+        .replace(/\[[#＃][^\]]+\]\(https?:\/\/[^\)]+\)/g, "")
+        .replace(/\s+/g, " ");
+      const sentences = normalized
+        .split(/[。.!！?？\n]|(?:然后|于是|终于|晚上)/)
+        .map((sentence) => sentence.trim())
+        .filter(Boolean);
+      const groups = [];
+      const seen = new Set();
+      const patterns = [
+        /(?:超大|大型)?([A-Za-z][A-Za-z0-9'’&.\-\s]{1,28}工厂店)/gi,
+        /([\u3400-\u9fff]{2,18}(?:工厂店|温泉街|温泉|美术馆|博物馆|神社|案内所|车站|站|寺|城|岛|公园|花园|市场|商店|书店|买手店))/g,
+        /(?:去了|去|到|在|来到|走到)\s*([\u3400-\u9fffA-Za-z][\u3400-\u9fffA-Za-z0-9'’&.\-\s]{1,18})(?:[（(][^）)]*[）)])?\s*(?:吃饭|用餐|午餐|晚餐|喝咖啡|买东西)/g
+      ];
+
+      for (const sentence of sentences) {
+        for (const pattern of patterns) {
+          pattern.lastIndex = 0;
+          let match;
+          while ((match = pattern.exec(sentence))) {
+            const title = normalizeEmbeddedPoiTitle(match[1]);
+            const contextualTitle = contextualizeEmbeddedPoiTitle(title, sentence);
+            if (!contextualTitle || seen.has(contextualTitle)) continue;
+            seen.add(contextualTitle);
+            groups.push({
+              title: contextualTitle,
+              area: city.trim(),
+              lines: [sentence]
+            });
+          }
+        }
+      }
+
+      return groups;
+    }
+
+    function contextualizeEmbeddedPoiTitle(title, sentence) {
+      let text = title.replace(/^(.{2,8})的案内所$/, "$1观光案内所").trim();
+      if (text === "观光案内所") {
+        const areaMatch = sentence.match(/(?:一到|到|赶去)([\u3400-\u9fff]{2,6})(?:都|就|，|,|\s)/);
+        if (areaMatch && !/(时候|这里|那里|上岛|下车)/.test(areaMatch[1])) {
+          text = `${areaMatch[1]}观光案内所`;
+        }
+      }
+      return text;
+    }
+
+    function isDayHeader(line) {
+      return /^DAY\s*\d+/i.test(line.trim());
+    }
+
+    function getDayArea(line, fallbackCity) {
+      const text = line
+        .replace(/^DAY\s*\d+\s*/i, "")
+        .replace(/[（(].*?[）)]/g, "")
+        .trim();
+      if (!text) return fallbackCity.trim();
+      const parts = text.split(/➡️|->|→|到|至/).map((part) => cleanPoiName(part)).filter(Boolean);
+      return parts.slice(-1)[0] || fallbackCity.trim();
+    }
+
+    function parseItineraryPois(lines, city) {
+      if (!lines.some(isDayHeader) || !lines.some((line) => /(?:\d+\uFE0F?\u20E3|🔟)/.test(line))) return [];
+
+      const groups = [];
+      const seen = new Set();
+      let dayArea = city.trim();
+      let dayRoute = [];
+
+      function add(title, description, area = dayArea) {
+        const cleaned = normalizeItineraryTitle(title);
+        if (!cleaned || seen.has(cleaned)) return;
+        seen.add(cleaned);
+        groups.push({ title: cleaned, area: inferItineraryArea(cleaned, description, area || city.trim(), dayRoute, city), lines: [description].filter(Boolean) });
+      }
+
+      for (const rawLine of lines) {
+        const line = rawLine.trim();
+        if (!line || isNoiseLine(line)) continue;
+        if (isDayHeader(line)) {
+          dayArea = getDayArea(line, city);
+          dayRoute = line
+            .replace(/^DAY\s*\d+\s*/i, "")
+            .replace(/[（(].*?[）)]/g, "")
+            .split(/➡️|->|→|到|至/)
+            .map((part) => cleanPoiName(part))
+            .filter(Boolean);
+          continue;
+        }
+        const isNumbered = /^(?:\s*(?:[0-9一二三四五六七八九十]+(?:\uFE0F?\u20E3)?|🔟)|\d+[.)、．-])/.test(line);
+        if (!isNumbered && /^(?:Ps|PS|by the way)[:：\s]/i.test(line)) continue;
+        if (!isNumbered && !/(百丽宫|威尼斯人|Sphere Vista Point|Boudin Bakery|Warming Hut|ABC store|progun|strip|lover|金门大桥|唐人街|岭南小馆|渔人码头|联合广场|麦当劳)/i.test(line)) continue;
+
+        const content = (isNumbered ? line
+          .replace(/^(?:\s*(?:[0-9一二三四五六七八九十]+(?:\uFE0F?\u20E3)?|🔟)\s*)+/, "")
+          .replace(/^[\d一二三四五六七八九十]+[.)、．-]\s*/, "") : line)
+          .trim();
+        const pieces = content.split(/➡️|→|->|\+/).map((part) => part.trim()).filter(Boolean);
+
+        for (const piece of pieces) {
+          const candidates = extractItineraryCandidates(piece);
+          for (const candidate of candidates) add(candidate, piece);
+        }
+      }
+
+      return groups;
+    }
+
+    function inferItineraryArea(title, description, defaultArea, route, city) {
+      const text = `${title} ${description}`;
+      const routeHit = (pattern) => route.find((area) => pattern.test(area));
+      if (/(金门大桥|Warming Hut|Powell St|渔人码头|Boudin Bakery|联合广场|唐人街|岭南小馆)/i.test(text)) {
+        return routeHit(/旧金山|San Francisco/i) || defaultArea || city.trim();
+      }
+      if (/(百丽宫|Las Vegas Strip|ABC Store|Pro Gun Vegas|KA Show|威尼斯人|Sphere Vista Point)/i.test(text)) {
+        return routeHit(/拉斯维加斯|Las Vegas|lv/i) || defaultArea || city.trim();
+      }
+      if (/黑金麦当劳/.test(title) && route.length) return route[0];
+      return defaultArea || city.trim();
+    }
+
+    function extractItineraryCandidates(text) {
+      const candidates = [];
+      const patterns = [
+        /([\u3400-\u9fff]{0,10}(?:渔人码头|联合广场|唐人街|岭南小馆|金门大桥|黑金麦当劳|strip大街|百丽宫|威尼斯人))/g,
+        /([A-Z][A-Za-z0-9'’&.\-\s]{2,40}(?:Bakery|Store|Point|Centre|Center|Vista Point|Vegas|store))/gi,
+        /\b(Powell St|Warming Hut Park Store|Boudin Bakery|ABC store|progun vegas|Sphere Vista Point|lover’s point|lover's point|strip)\b/gi,
+        /(?:选了|选)(ka秀|awakening秀|o秀|ka)\b/gi
+      ];
+
+      for (const pattern of patterns) {
+        pattern.lastIndex = 0;
+        let match;
+        while ((match = pattern.exec(text))) {
+          candidates.push(match[1]);
+        }
+      }
+      return candidates;
+    }
+
+    function normalizeItineraryTitle(title) {
+      let text = cleanPoiName(title)
+        .replace(/^(?:先|再|又|还|去|到|在|逛|吃|打卡|体验|蹲守|选择作为|解决了|顺便|选了|选)/, "")
+        .replace(/^.*?(?=(?:渔人码头|联合广场|唐人街|岭南小馆|金门大桥|黑金麦当劳|strip大街|百丽宫|威尼斯人)$)/, "")
+        .replace(/(?:的)?(?:chowder|表情包|套餐|早饭|日落|黑皮kitty|窗户|海狮).*$/i, "")
+        .replace(/(?:的)?(?:welcome centre)$/i, " Welcome Center")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      const aliases = {
+        "金门大桥的 Welcome Center": "金门大桥 Welcome Center",
+        "金门大桥的welcome centre": "金门大桥 Welcome Center",
+        "金门大桥的welcome center": "金门大桥 Welcome Center",
+        "Welcome Center": "金门大桥 Welcome Center",
+        "lover’s point": "Lover's Point",
+        "lover's point": "Lover's Point",
+        "strip": "Las Vegas Strip",
+        "strip大街": "Las Vegas Strip",
+        "ABC store": "ABC Store",
+        "progun vegas": "Pro Gun Vegas",
+        "ka": "KA Show",
+        "ka秀": "KA Show",
+        "o秀": "O Show",
+        "awakening秀": "Awakening Show"
+      };
+      const key = Object.keys(aliases).find((item) => item.toLowerCase() === text.toLowerCase());
+      if (key) text = aliases[key];
+
+      if (!text || text.length < 2 || text.length > 42) return "";
+      if (/^(?:下午四点|早上起床|开车|小镇|这里|这家|晚上|中午|F|MP5|市长|公共交通|第二天|晴天滤镜|一日票|黑金麦当劳)$/.test(text)) return text === "黑金麦当劳" ? text : "";
+      if (/(?:很适合|不用|太热|不适合|不会再吃|解决了|顺便|漂亮|成群|不怕生|事实证明|建议提前)/.test(text)) return "";
+      return text;
+    }
+
     function looksLikeSentence(line) {
       const text = line.trim();
       if (/[。.!！?？]/.test(text)) return true;
@@ -965,6 +1171,7 @@
 
     function classifyType(text) {
       const lower = text.toLowerCase();
+      if (/^(?:渔人码头|联合广场|唐人街|金门大桥|Lover's Point|Las Vegas Strip|Sphere Vista Point|威尼斯人)/i.test(text)) return "景点";
       if (/^.{0,30}(珈琲|咖啡|cafe|café|coffee)/i.test(text)) return "咖啡";
       if (/(面包店|面包|吐司|可颂|法棍|🥯|🥖|🍞|🥐|bakery|bread)/i.test(lower)) return "餐厅";
       for (const [type, words] of TYPE_KEYWORDS) {
@@ -984,6 +1191,7 @@
             .replace(/[，,。.!！?？].*$/, "")
             .trim();
           if (/^(从|因为|这次|今天|昨天|后来|可以|几乎|所有|主要|点餐|支付|国内|带了|昨天后来)/.test(area)) continue;
+          if (area.length > 18 || /小城/.test(area)) continue;
           if (/(周边|指路|下单|回忆|社区)$/.test(area) || /^(但和|店内|时髦社区|友指路)/.test(area)) continue;
           if (area && city && !area.toLowerCase().includes(city.toLowerCase())) return `${area} / ${city}`;
           if (area) return area;
@@ -1025,6 +1233,9 @@
         .replace(/\[[#＃][^\]]+\]\(https?:\/\/[^\)]+\)/g, "")
         .split(/\r?\n/)
         .map((line) => line.trim());
+      const itineraryGroups = parseItineraryPois(lines, city);
+      if (itineraryGroups.length >= 3) return groupsToPois(itineraryGroups, city);
+
       const groups = [];
       let current = null;
       let inListSection = false;
@@ -1095,6 +1306,10 @@
       }
 
       if (!groups.length) {
+        groups.push(...parseEmbeddedPois(text, city));
+      }
+
+      if (!groups.length) {
         const blocks = text
           .split(/\n\s*\n/)
           .map((block) => block.trim())
@@ -1112,6 +1327,10 @@
         }
       }
 
+      return groupsToPois(groups, city);
+    }
+
+    function groupsToPois(groups, city) {
       return mergeDuplicateGroups(groups)
         .filter((group) => group.title)
         .map((group) => {
@@ -1121,7 +1340,7 @@
           return {
             id: uid(),
             name: group.title,
-            area: group.area ? (city.trim() ? `${group.area} / ${city.trim()}` : group.area) : detectArea(description, city.trim()),
+            area: group.area ? (city.trim() && group.area.toLowerCase() !== city.trim().toLowerCase() ? `${group.area} / ${city.trim()}` : group.area) : detectArea(description, city.trim()),
             type,
             reason: summarizeReason(group.title, type, description),
             clue: summarizeClue(description)
