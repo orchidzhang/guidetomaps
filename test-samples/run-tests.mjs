@@ -56,13 +56,20 @@ for (const sample of samples) {
   const missing = sample.expectedPois.filter((name) => !names.includes(name));
   const unexpected = sample.unexpectedPois.filter((name) => names.includes(name));
   const extras = names.filter((name) => !sample.expectedPois.includes(name));
+  const urls = pois.map((poi) => context.mapUrl(poi));
+  const forbiddenMapTerms = sample.forbiddenMapTerms || [];
+  const forbiddenUrls = forbiddenMapTerms.filter((term) => {
+    const encoded = encodeURIComponent(term);
+    return urls.some((url) => url.includes(term) || url.includes(encoded));
+  });
 
-  if (missing.length || unexpected.length || extras.length) {
+  if (missing.length || unexpected.length || extras.length || forbiddenUrls.length) {
     failed = true;
     console.error(`FAIL ${sample.name}`);
     if (missing.length) console.error(`  Missing: ${missing.join(", ")}`);
     if (unexpected.length) console.error(`  Unexpected: ${unexpected.join(", ")}`);
     if (extras.length) console.error(`  Extras: ${extras.join(", ")}`);
+    if (forbiddenUrls.length) console.error(`  Forbidden map terms: ${forbiddenUrls.join(", ")}`);
     console.error(`  Actual: ${names.join(", ")}`);
   } else {
     console.log(`PASS ${sample.name}: ${names.length} POIs`);

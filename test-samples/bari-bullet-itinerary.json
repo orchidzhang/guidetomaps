@@ -1,0 +1,24 @@
+{
+  "name": "bari-bullet-itinerary",
+  "city": "Bari",
+  "input": "Day 1）抵达 Bari（住 Bari）\n•\t抵达后前往 Bari Centrale （打车差不多50欧）\n•\t傍晚逛 Bari 老城 Bari Vecchia\n•\t圣尼古拉教堂\n•\t海边长廊 Lungomare\n•\t老奶奶做手工意面的街 Via Arco Basso\n（Day 2）Bari 城市日（住 Bari）\n•\t慢慢走老城\n•\t逛鱼市场、传统街区\n•\t午餐推荐海鲜\n•\t下午可以去海边散步\n（Day 3）Matera 一日游（住 Bari）（这天实际上被我删了，我没有去）\n•\t早上从 Bari 出发（火车/大巴 70–90 分钟）\n•\t游览世界遗产洞穴城市 Sassi\n•\t蓝色/褐色的石头墙\n•\t傍晚回 Bari",
+  "expectedPois": [
+    "Bari Centrale",
+    "Bari Vecchia",
+    "圣尼古拉教堂",
+    "Lungomare",
+    "Via Arco Basso"
+  ],
+  "unexpectedPois": [
+    "打车差不多50欧",
+    "慢慢走老城",
+    "午餐推荐海鲜",
+    "下午可以去海边散步",
+    "Sassi",
+    "蓝色/褐色的石头墙",
+    "傍晚回 Bari"
+  ],
+  "forbiddenMapTerms": [
+    "抵达"
+  ]
+}
