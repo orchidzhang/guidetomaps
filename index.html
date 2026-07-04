@@ -1994,6 +1994,7 @@
 
     function cleanPoiName(line) {
       return line
+        .replace(/^\s*\[[^\]]{1,12}R\]\s*/i, "")
         .replace(/\s*[^\dA-Za-zÀ-ÿ\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]*\s*P\d+(?:\s*[-—~至到和、]\s*\d+)?\s*$/i, "")
         .replace(/^(?:\s*(?:[0-9一二三四五六七八九十]+(?:\uFE0F?\u20E3)?|🔟)\s*)+/, "")
         .replace(/^[\s\d一二三四五六七八九十]+[.)、．-]\s*/, "")
@@ -2024,6 +2025,7 @@
     function cleanAddressLine(line) {
       return line
         .replace(/^\s*(?:📍|地址[:：]|位置[:：]|address[:：])\s*/i, "")
+        .replace(/\s*(?:是我去的这家|是我去的|我去的这家|这家)\s*$/i, "")
         .trim();
     }
 
@@ -2074,6 +2076,8 @@
       if (!match) return null;
 
       const content = match[1].trim().replace(/[（(][^）)]*$/, "").trim();
+      if (/^(?:在|距离|离|从|有|是|这|这里|那边|附近)/.test(content)) return null;
+      if (/(?:地方|远|近|分店|就近|可以|选择|市中心)/.test(content) && !hasPlaceNameShape(content)) return null;
       if (!content || content.length > 54 || looksLikeSentence(content)) return null;
       const titlePart = cleanCaptionTitle(content);
       const detail = content.slice(titlePart.length).replace(/^[|｜：:。.!！?？，,\s]+/, "").trim();
@@ -2161,7 +2165,9 @@
       const description = (group?.lines || []).join("。");
       if (!title) return true;
       if (title.length > 42 || looksLikeSentence(title)) return true;
+      if (/^(?:to|top\d*|首先top\d*|Nr\.?\s*\d+)$/i.test(title)) return true;
       if (/(?:行程是|路线|打卡照相|谷歌地图)/.test(title)) return true;
+      if (/^(?:or|上午|中午|下午|晚上|早上|傍晚|部分季节|躺平|靠窗|缺点|营业时间|周一|周二|周三|周四|周五|周六|周日)/i.test(title)) return true;
       if (/(?:不用|可以|建议|提前|特别|很多|随便|直接|完全|真的|感觉|时候|这里|里面|路线|记录一下)/.test(title)) return true;
       const score = scorePoiCandidate(title, group.rawLine || title, description || "", true);
       return score < 3;
@@ -2758,6 +2764,48 @@
       return groups;
     }
 
+    function normalizeRankedPoiTitle(title) {
+      let text = cleanPoiName(String(title || ""))
+        .replace(/\s*图[一二三四五六七八九十\d]+(?:\s*[-—~至到和、\s]\s*[一二三四五六七八九十\d]+)*\s*$/i, "")
+        .replace(/[（(].*?[）)]/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      if (!text || text.length < 2 || text.length > 42) return "";
+      if (/^(?:to|top\d*|首先top\d*|Nr\.?\s*\d+)$/i.test(text)) return "";
+      return text;
+    }
+
+    function appendRankedPois(groups, text, city) {
+      if (!/\bNr\.?\s*\d+/i.test(text)) return groups;
+      const seen = new Set(groups.map((group) => normalizeRankedPoiTitle(group.title).toLowerCase()).filter(Boolean));
+      const lines = text
+        .replace(/\[[#＃][^\]]+\]\(https?:\/\/[^\)]+\)/g, "")
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean);
+
+      function add(title, detail) {
+        const cleaned = normalizeRankedPoiTitle(title);
+        const key = cleaned.toLowerCase();
+        if (!cleaned || seen.has(key)) return;
+        seen.add(key);
+        groups.push({
+          title: cleaned,
+          area: city.trim(),
+          lines: [detail].filter(Boolean),
+          rawLine: detail || title
+        });
+      }
+
+      for (const line of lines) {
+        const match = line.match(/^Nr\.?\s*\d+\s*(?:[.:：]\s*)?(.+)$/i);
+        if (match) add(match[1], line);
+      }
+
+      return groups;
+    }
+
     function parseEmbeddedPois(text, city) {
       const normalized = text
         .replace(/\[[#＃][^\]]+\]\(https?:\/\/[^\)]+\)/g, "")
@@ -2957,6 +3005,7 @@
 
     function looksLikeSentence(line) {
       const text = line.trim();
+      if (/^(?:每天|周一|周二|周三|周四|周五|周六|周日|营业时间)/.test(text)) return true;
       if (/^[A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{2,42}$/.test(text) && text.split(/\s+/).length <= 6) return false;
       if (/[。.!！?？]/.test(text)) return true;
       if (text.length > 24 && /[的了在是有和与就都也很超多不用可以看到随处最近由于去年那天]/.test(text)) return true;
@@ -3142,6 +3191,7 @@
       appendGuideMentionPois(groups, text, city);
       appendContextMentionPois(groups, text, city);
       appendDailyListPois(groups, text, city);
+      appendRankedPois(groups, text, city);
 
       if (!groups.length) {
         const inlineTitle = parseInlinePoi(text);

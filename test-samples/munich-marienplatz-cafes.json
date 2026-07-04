@@ -1,0 +1,21 @@
+{
+  "name": "munich-marienplatz-cafes",
+  "city": "慕尼黑",
+  "input": "1.早上or中午来，靠窗的位置可以看到市政厅的木偶表演（每天11点、12点，部分季节17点加场)\n缺点是人很多，排队店，有很多套餐，但都是是妥妥白人饭[呃R]\n\t\n[星R]Cafe Glockenspiel GmbH\n营业时间：\n周一到周六：9:00-23:00\n周日：10：00-23:00\n地址：Marienplatz 28, 80331 München\n====================\n2. ☕️ 下午躺平可去雀巢咖啡体验馆，就在钟楼正对面，2楼大窗户正对着市政厅钟楼，哥特式尖顶近在眼前，缺点是你不一定等到好位置[微笑R]\n\t\n[星R]Nespresso House München\n营业时间：\n周一到周六：10:00-20:00",
+  "expectedPois": [
+    "Cafe Glockenspiel GmbH",
+    "Nespresso House München"
+  ],
+  "unexpectedPois": [
+    "每天11点、12点，部分季节17点加场",
+    "星R]Cafe Glockenspiel GmbH",
+    "星R]Nespresso House München",
+    "营业时间",
+    "周一到周六"
+  ],
+  "forbiddenMapTerms": [
+    "每天11点",
+    "星R]",
+    "营业时间"
+  ]
+}
