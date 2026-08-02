@@ -1,0 +1,8 @@
+{
+  "name": "non-poi-question",
+  "input": "这段怎么又识别不出来了\n这段怎么又识别不出来了",
+  "expectedPois": [],
+  "unexpectedPois": [
+    "这段怎么又识别不出来了"
+  ]
+}

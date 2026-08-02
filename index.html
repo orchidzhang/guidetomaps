@@ -1894,6 +1894,41 @@
       }
 
     }
+
+    /* Keep the card metadata quiet until the extractor has a useful location. */
+    .place-card select[data-field="type"] {
+      appearance: none;
+      width: auto;
+      min-width: 112px;
+      max-width: none;
+      padding: 6px 38px 6px 16px;
+      background-color: #f6f0e7;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3 5 5 5 5-5' fill='none' stroke='%234d4a43' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.8'/%3E%3C/svg%3E");
+      background-position: right 15px center;
+      background-repeat: no-repeat;
+      background-size: 15px;
+      text-align: left;
+      text-align-last: left;
+    }
+
+    .place-meta {
+      min-height: 0;
+    }
+
+    .place-area {
+      display: inline-flex;
+      max-width: 100%;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: #faf7f2;
+    }
+
+    .place-area input {
+      width: auto;
+      max-width: 100%;
+      min-height: 22px;
+      padding: 0;
+    }
   </style>
 </head>
 <body>
@@ -2068,6 +2103,17 @@
       return { title, area: "", detail: "" };
     }
 
+    function parseRankedPoi(line) {
+      const raw = String(line || "").trim();
+      if (!/^Nr\.?\s*\d+\s*\.?\s*(?:[:：]\s*)?/i.test(raw)) return null;
+      const title = cleanPoiName(raw
+        .replace(/^Nr\.?\s*\d+\s*\.?\s*(?:[:：]\s*)?/i, "")
+        .replace(/\s*[（(][^）)]*[）)]/g, "")
+        .replace(/\s*(?:图|P)\s*\d+(?:\s*(?:[~\-至到和、]\s*|\s+)\d+)*\s*$/i, ""));
+      if (!title || title.length > 42 || !/^[A-Za-zÀ-ÿ]/.test(title)) return null;
+      return { title, area: "", detail: "" };
+    }
+
     function parseCaptionPoi(line) {
       const text = cleanPoiName(line.trim().replace(/[（(][^）)]*$/, ""));
       const match = text.match(/^(?:图[一二三四五六七八九十\d]+(?:图[一二三四五六七八九十\d]+)*(?:[-—~至到和、图一二三四五六七八九十\d]*)?|P\d+(?:\s*[-—~至到和、]\s*\d+)?)\s*(?:[：:]\s*)?(.+)$/i);
@@ -2159,6 +2205,7 @@
       const title = refinePoiTitle(group?.title || "");
       const description = (group?.lines || []).join("。");
       if (!title) return true;
+      if (isConversationalText(title)) return true;
       if (title.length > 42 || looksLikeSentence(title)) return true;
       if (/(?:不用|可以|建议|提前|特别|很多|随便|直接|完全|真的|感觉|时候|这里|里面|路线|记录一下)/.test(title)) return true;
       const score = scorePoiCandidate(title, group.rawLine || title, description || "", true);
@@ -2287,6 +2334,19 @@
           });
         }
       }
+
+      const coffeeMentionPattern = /好评的\s*([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9'’&.\-]*(?:\s+[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9'’&.\-]*){0,4})(?=[，,。])/gi;
+      let coffeeMention;
+      while ((coffeeMention = coffeeMentionPattern.exec(normalized))) {
+        const title = normalizeEmbeddedPoiTitle(coffeeMention[1]);
+        if (!title || seen.has(title)) continue;
+        seen.add(title);
+        groups.push({
+          title,
+          area: city.trim(),
+          lines: [coffeeMention[0]]
+        });
+      }
       return groups;
     }
 
@@ -2329,6 +2389,7 @@
 
       if (!text || text.length < 2 || text.length > 42) return "";
       if (/^(?:Day\d+|Part\d+|友情提示|当天往返|第二天|这里|里面|一楼|二楼|全都|Klook|Google Map)$/i.test(text)) return "";
+      if (/^小鳄鱼$/.test(text)) return "";
       if (/^(?:View Point)$/i.test(text)) return "";
       if (/^(?:餐厅|商店|要塞|咖啡店|面包店|书店|温泉街|老城|老城区|漂亮面包店|车站|神社|灯塔|停车场|巴士停车站|安内所)$/.test(text)) return "";
       if (/^(?:买了|返|作为|但|整条|绝对|餐厅和|商店很多|漂亮|辽阔|古朴|很多|整个|最后我|电车里|之后就是)/.test(text)) return "";
@@ -2354,7 +2415,33 @@
         groups.push({ title: cleaned, area, lines: [detail].filter(Boolean), rawLine, suspicious });
       }
 
+      function addContextualLatinMentions(line) {
+        if (!/(?:买|带回|拿了|逛|咖啡豆|帽子|碗碟|杯子|店里)/.test(line)) return;
+
+        const name = "[A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\\-]*(?:\\s+[A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\\-]*){0,4}";
+        const pairedNames = new RegExp(`(${name}(?:\\s*和\\s*${name})+)\\s*(?:的|在)`);
+        const itemName = new RegExp(`(${name})\\s*的(?:咖啡豆|帽子|碗碟|杯子)`, "g");
+        const leadingName = new RegExp(`^(${name})\\s*(?:还是|也|又|照常|在|店)`);
+
+        const pairMatch = line.match(pairedNames);
+        if (pairMatch) {
+          pairMatch[1].split(/\s*和\s*/).forEach((title) => add(title, line));
+        }
+
+        itemName.lastIndex = 0;
+        let itemMatch;
+        while ((itemMatch = itemName.exec(line))) add(itemMatch[1], line);
+
+        const leadingMatch = line.match(leadingName);
+        if (leadingMatch) add(leadingMatch[1], line);
+      }
+
       for (const line of lines) {
+        addContextualLatinMentions(line);
+
+        const coffeeMention = line.match(/(?:好评的|今年新开的)\s*([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9'’&.\-]*(?:\s+[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9'’&.\-]*){0,4})(?=[，,。])/i);
+        if (coffeeMention && /咖啡|coffee|手冲|flat\s*white/i.test(line)) add(coffeeMention[1], line);
+
         let match = line.match(/^✔️?\s*(?:上午|中午|下午|晚上|早上|傍晚)?\s*[（(]([^）)]{2,42})[）)]\s*[：:，,]?\s*(.*)$/);
         if (match) add(match[1], match[2] || line);
 
@@ -2628,9 +2715,14 @@
       return false;
     }
 
+    function isConversationalText(text) {
+      return /(?:怎么又|为什么|为啥|识别不出来|能不能|请问|帮我看看)/.test(String(text || ""));
+    }
+
     function isShortPoiCandidate(line, nextLine, inListSection, startsBlock) {
       const cleaned = cleanPoiName(line);
       if (!inListSection || !startsBlock || !cleaned || cleaned.length > 42) return false;
+      if (isConversationalText(cleaned)) return false;
       if (isSectionHeader(line) || isNoiseLine(line) || looksLikeSentence(cleaned)) return false;
       if (nextLine && isSectionHeader(nextLine)) return false;
       if (/^[0-9A-Za-zÀ-ÿ\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af][0-9A-Za-zÀ-ÿ\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af'’&.\-\s（）()・の]+$/.test(cleaned)) return true;
@@ -2641,6 +2733,7 @@
       const raw = line.trim();
       const cleaned = cleanPoiName(raw);
       if (!cleaned || cleaned.length > 54) return false;
+      if (isConversationalText(cleaned)) return false;
       if (isDayHeader(raw)) return false;
       if (isAddressLine(raw)) return false;
       if (parseDetailLine(raw)) return false;
@@ -2783,9 +2876,13 @@
           continue;
         }
 
+        const rankedPoi = parseRankedPoi(trimmed);
         const pageSuffixPoi = parsePageSuffixPoi(trimmed);
         const captionPoi = parseCaptionPoi(trimmed);
-        if (pageSuffixPoi && pageSuffixPoi.title) {
+        if (rankedPoi && rankedPoi.title) {
+          if (current) groups.push(current);
+          current = { title: rankedPoi.title, area: rankedPoi.area, lines: [], rawLine: trimmed };
+        } else if (pageSuffixPoi && pageSuffixPoi.title) {
           if (current) groups.push(current);
           current = { title: pageSuffixPoi.title, area: pageSuffixPoi.area, lines: [], rawLine: trimmed };
         } else if (captionPoi && captionPoi.title) {
@@ -2831,7 +2928,9 @@
           if (titleMatch) {
             const title = cleanPoiName(titleMatch[1]);
             const firstDescription = titleMatch[2] || "";
-            if (title) groups.push({ title, lines: [firstDescription, ...blockLines.slice(1)].filter(Boolean) });
+            if (title && hasPlaceNameShape(title)) {
+              groups.push({ title, lines: [firstDescription, ...blockLines.slice(1)].filter(Boolean) });
+            }
           }
         }
       }
@@ -2903,6 +3002,8 @@
       for (const poi of pois) {
         const card = document.createElement("article");
         card.className = "place-card";
+        const area = String(poi.area || "").trim();
+        const areaSize = Math.max(4, Math.min(22, Array.from(area).length + 1));
         card.innerHTML = `
           <div class="place-icon" aria-hidden="true">
             <span class="place-pin">📍</span>
@@ -2916,11 +3017,7 @@
                 ${TYPES.map((type) => `<option value="${type}" ${type === poi.type ? "selected" : ""}>${typeIcon(type)} ${typeLabel(type)}</option>`).join("")}
               </select>
             </div>
-            <div class="place-meta">
-              <div class="place-area">
-                <input data-field="area" value="${escapeHtml(poi.area)}" aria-label="区域或城市">
-              </div>
-            </div>
+            ${area ? `<div class="place-meta"><div class="place-area"><input data-field="area" value="${escapeHtml(area)}" size="${areaSize}" aria-label="区域或城市"></div></div>` : ""}
             <textarea data-field="reason" aria-label="推荐理由">${escapeHtml(poi.reason)}</textarea>
           </div>
           <div class="place-actions">

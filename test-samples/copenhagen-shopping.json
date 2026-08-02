@@ -1,0 +1,18 @@
+{
+  "name": "copenhagen-shopping",
+  "city": "Copenhagen",
+  "input": "每次去哥本哈根，总会买一些差不多的东西。\n\nTekla。\n家里已经有很多条不同颜色了。\n这次没有遇到特别喜欢的颜色，甚至店里的选择还没有伦敦齐，最后还是拿了一条黑色。\n\nApril 和 Prolog 的咖啡豆照常带回去。\nLa Cabra 和 Coffee Collective 在伦敦也买得到，这次就没有买。\n\nHay 还是进去逛了一圈。买了几个喜欢的合作碗碟\n\nAtelier September 的帽子。\n\n酒店前台的火柴盒也顺手拿了一盒。\n\n最后在机场顺手拿了Mikkeller的杯子。",
+  "expectedPois": [
+    "Tekla",
+    "April",
+    "Prolog",
+    "La Cabra",
+    "Coffee Collective",
+    "Hay",
+    "Atelier September",
+    "Mikkeller"
+  ],
+  "unexpectedPois": [
+    "酒店前台"
+  ]
+}
