@@ -1,0 +1,18 @@
+{
+  "name": "vienna-churches-bilingual",
+  "city": "Vienna",
+  "input": "圣卡尔教堂 Karlskirche\n要买门票，可登顶\n这个教堂刷过无数次，当进去那一瞬间，还是被震撼到\n( 卡尔教堂离金色大厅，维也纳博物馆，现代美术馆相隔很近，可安排一起去)\n\n2️⃣P5-8\n沃蒂夫教堂 Votivkirche\n塔尖上无限♾️的logo已成为他的标志\n日常免费进，晚上有灯光秀要订票\n下一篇分享，值得看\n( 离维也纳市政厅步行可到 )\n\n3️⃣P9-12\n圣斯蒂芬大教堂 Stephansdom\n维也纳城市地标\n免费进，可买票登顶136m塔尖\n\n4️⃣P13-15\n圣弥额尔堂 Pfarre St. Michael\n免费进，进到内厅真有种在暗黑中看到光明的感觉\n\n5️⃣P16-18\n圣伯多禄教堂 Peterskirche\n免费进，刚好遇到弥撒\n\n6️⃣还路经存放哈布斯堡皇室心脏的教堂奥古斯丁教堂Augustinerkirche\n\n3️⃣4️⃣5️⃣6️⃣刚好都是互相步行可达，可以同一天city walk的看完\n\n维也纳基本上几步就一个教堂，大多是免费进的\n每家都各有特色\n时间有限的朋友推荐以上5个，真的人间精品",
+  "expectedPois": [
+    "Karlskirche",
+    "Votivkirche",
+    "Stephansdom",
+    "Pfarre St. Michael",
+    "Peterskirche",
+    "Augustinerkirche"
+  ],
+  "unexpectedPois": [
+    "维也纳博物馆",
+    "现代美术馆",
+    "刚好都是互相步行可达"
+  ]
+}

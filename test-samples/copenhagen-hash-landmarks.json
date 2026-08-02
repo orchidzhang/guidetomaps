@@ -1,0 +1,7 @@
+{
+  "name": "copenhagen-hash-landmarks",
+  "city": "Copenhagen",
+  "input": "# 新港Nyhavn(P1-2) 彩房子城市地标\n# 圆塔登顶The Round Tower（P3）门票60DKK\n# 卡斯特雷特城堡Kastellet（P4-5）小美人鱼雕像也在这，但远没有这个免费公园本身好看\n# 克里斯蒂安堡宫Christiansborg Palace（P6）\n# 管风琴教堂Grundtvigs Kirke（P7-9）简约的美，非常有特点\n# 玻璃陶瓷工艺品店Studio Arhoj（P10-11）店里有工作人员现场烧制陶瓷和玻璃，每一个制品都是独一无二的，值得一逛\n# 安徒生雕像Hans Christian Andersen by Henry Luckow-Nielsen（P13）\n# 日料自助Nozomi（P14）周末289DKK每人，另外需要点一杯计费的饮料，食材很新鲜，非常好吃～\n# 趣伏里公园Tivoli Gardens(P15-18) 感觉更像是一个游乐场，入园需要门票。\n# 对丹麦皇家珠宝感兴趣的话可以逛一逛玫瑰堡Rosenborg Castle，最好提前订票，我们当天过去已经没票了",
+  "expectedPois": ["Nyhavn", "The Round Tower", "Kastellet", "Christiansborg Palace", "Grundtvigs Kirke", "Studio Arhoj", "Hans Christian Andersen by Henry Luckow-Nielsen", "Nozomi", "Tivoli Gardens", "Rosenborg Castle"],
+  "unexpectedPois": []
+}

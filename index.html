@@ -695,6 +695,10 @@
       gap: 10px;
     }
 
+    .place-name {
+      min-width: 0;
+    }
+
     .place-meta {
       display: flex;
       align-items: center;
@@ -737,6 +741,26 @@
       line-height: 1.2;
       text-align: center;
       text-align-last: center;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .place-type {
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .place-type::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: 13px;
+      width: 7px;
+      height: 7px;
+      border-right: 2px solid #70695f;
+      border-bottom: 2px solid #70695f;
+      transform: translateY(-65%) rotate(45deg);
+      pointer-events: none;
     }
 
     .place-name input {
@@ -757,9 +781,10 @@
     }
 
     .place-card textarea {
-      min-height: 58px;
+      min-height: 0;
       padding: 3px 0 0;
-      resize: vertical;
+      resize: none;
+      overflow: hidden;
       color: #2b2b2d;
       font-size: 16px;
       line-height: 1.65;
@@ -840,6 +865,20 @@
       margin: 8px auto 0;
       max-width: 440px;
       line-height: 1.6;
+    }
+
+    .empty-actions {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .empty-actions .btn {
+      min-height: 38px;
+      padding: 8px 14px;
+      font-size: 13px;
     }
 
     .link-drawer {
@@ -976,38 +1015,26 @@
 
       .hero h1 {
         position: relative;
-        padding-left: 50px;
+        padding-left: 60px;
         font-size: clamp(44px, 4.6vw, 62px);
         line-height: 0.98;
         font-weight: 780;
       }
 
       .hero h1::before {
-        content: "•";
+        content: "";
         position: absolute;
         left: 0;
-        top: 3px;
-        width: 34px;
-        height: 34px;
-        border-radius: 999px;
-        background: #f4c65d;
-        color: #fff;
-        display: grid;
-        place-items: center;
-        font-size: 34px;
-        line-height: 1;
-        box-shadow: 0 10px 22px rgba(216, 168, 79, 0.22);
+        top: 50%;
+        width: 48px;
+        height: 48px;
+        transform: translateY(-50%);
+        border-radius: 12px;
+        background: url("icon-180.png") center / contain no-repeat;
       }
 
       .hero h1::after {
-        content: "";
-        position: absolute;
-        left: 16px;
-        top: 34px;
-        width: 2px;
-        height: 22px;
-        border-radius: 999px;
-        background: rgba(216, 168, 79, 0.58);
+        content: none;
       }
 
       .subtitle {
@@ -1273,7 +1300,8 @@
       }
 
       .place-head {
-        display: flex;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
         align-items: center;
         gap: 10px;
       }
@@ -1310,12 +1338,12 @@
       }
 
       .place-card textarea {
-        min-height: 26px;
+        min-height: 0;
         padding: 0;
         color: #626765;
         font-size: 14px;
         line-height: 1.45;
-        resize: vertical;
+        resize: none;
       }
 
       .place-actions {
@@ -1555,7 +1583,8 @@
       }
 
       .place-head {
-        display: flex;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
         align-items: center;
       }
 
@@ -1862,9 +1891,9 @@
       }
 
       .place-card textarea {
-        min-height: 54px;
+        min-height: 0;
         line-height: 1.58;
-        resize: vertical;
+        resize: none;
       }
 
       .place-actions {
@@ -1894,40 +1923,189 @@
       }
 
     }
+    /* Keep the type close to the place details while leaving the action rail compact. */
+    .place-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
 
-    /* Keep the card metadata quiet until the extractor has a useful location. */
-    .place-card select[data-field="type"] {
-      appearance: none;
+    .place-head .place-name {
+      flex: 1 1 260px;
+      min-width: 0;
       width: auto;
-      min-width: 112px;
-      max-width: none;
-      padding: 6px 38px 6px 16px;
-      background-color: #f6f0e7;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3 5 5 5 5-5' fill='none' stroke='%234d4a43' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.8'/%3E%3C/svg%3E");
-      background-position: right 15px center;
-      background-repeat: no-repeat;
-      background-size: 15px;
-      text-align: left;
-      text-align-last: left;
+    }
+
+    .place-head .place-name textarea {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      min-height: 30px;
+      padding: 0;
+      resize: none;
+      overflow: hidden;
+      color: #202624;
+      font-size: 20px;
+      line-height: 1.22;
+      font-weight: 760;
+      white-space: pre-wrap;
     }
 
     .place-meta {
-      min-height: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 18px;
     }
 
     .place-area {
-      display: inline-flex;
-      max-width: 100%;
-      padding: 2px 8px;
-      border-radius: 6px;
-      background: #faf7f2;
+      min-width: 0;
     }
 
-    .place-area input {
+    .place-card .place-type {
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .place-card .place-type::after {
+      right: 12px;
+      width: 7px;
+      height: 7px;
+      border-width: 0 2px 2px 0;
+      transform: translateY(-65%) rotate(45deg);
+    }
+
+    .place-card .place-type select {
       width: auto;
-      max-width: 100%;
-      min-height: 22px;
-      padding: 0;
+      min-width: 82px;
+      max-width: none;
+      min-height: 30px;
+      padding: 5px 29px 5px 12px;
+      border: 0;
+      border-radius: 999px;
+      background: #f6f0e7;
+      color: #4d4a43;
+      font-size: 12px;
+      font-weight: 650;
+      line-height: 1.35;
+      text-align: center;
+      text-align-last: center;
+    }
+
+    .place-card .place-type select:focus {
+      background: #f6f0e7;
+      box-shadow: none;
+      color: var(--accent);
+    }
+
+    .place-actions {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 8px;
+    }
+
+    .place-actions .map-link {
+      grid-column: 1 / -1;
+    }
+
+    .actions .ocr-trigger {
+      grid-column: 1 / -1;
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      color: #4c514e;
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .ocr-trigger small {
+      color: #8a8d8c;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .minor-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: #b1aaa0;
+      font-size: 13px;
+    }
+
+    .text-action {
+      padding: 4px;
+      border: 0;
+      background: transparent;
+      color: #666b68;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .text-action:hover {
+      color: var(--accent);
+    }
+
+    .text-action.danger-text {
+      color: #bd665d;
+    }
+
+    .ocr-retry {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 7px;
+      margin-top: 10px;
+      color: #89847c;
+      font-size: 12px;
+    }
+
+    .ocr-retry.hidden {
+      display: none;
+    }
+
+    .ocr-retry button {
+      padding: 3px 7px;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      color: #517469;
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .ocr-retry button:hover {
+      background: #eef4f1;
+    }
+
+    @media (min-width: 981px) {
+      .place-card {
+        grid-template-columns: 52px minmax(0, 1fr) 184px;
+      }
+
+      .place-actions {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 8px;
+      }
+
+      .place-actions .map-link {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .place-meta {
+        gap: 8px;
+      }
+
+      .place-card .place-type select {
+        font-size: 12px;
+      }
     }
   </style>
 </head>
@@ -1956,8 +2134,22 @@
 
         <div class="actions">
           <button class="btn primary" id="extractBtn" type="button">提取地点</button>
-          <button class="btn danger" id="clearBtn" type="button">清空</button>
-          <button class="btn light" id="sampleBtn" type="button">填入示例</button>
+          <button class="btn light ocr-trigger" id="imageOcrBtn" type="button">
+            <span>上传截图识别</span><small>自动识别语言</small>
+          </button>
+          <div class="minor-actions">
+            <button class="text-action" id="sampleBtn" type="button">填入示例</button>
+            <span aria-hidden="true">·</span>
+            <button class="text-action danger-text" id="clearBtn" type="button">清空</button>
+          </div>
+        </div>
+        <input id="imageOcrInput" type="file" accept="image/*" hidden>
+        <div class="ocr-retry hidden" id="ocrRetry">
+          <span>识别不准？</span>
+          <button type="button" data-ocr-language="chi_sim+eng">中文</button>
+          <button type="button" data-ocr-language="jpn+eng">日文</button>
+          <button type="button" data-ocr-language="kor+eng">韩文</button>
+          <button type="button" data-ocr-language="chi_sim+eng+jpn+kor">多语言</button>
         </div>
       </div>
 
@@ -1979,9 +2171,20 @@
           <div id="poiBody"></div>
         </div>
         <div class="empty" id="emptyState">
-          <div class="empty-icon">📍</div>
-          <p class="empty-title">粘贴一篇旅行攻略开始。</p>
-          <p class="empty-copy">我们会帮你提取咖啡店、餐厅、商店、景点和酒店。</p>
+          <div id="emptyInitial">
+            <div class="empty-icon">📍</div>
+            <p class="empty-title">粘贴一篇旅行攻略开始。</p>
+            <p class="empty-copy">我们会帮你提取咖啡店、餐厅、商店、景点和酒店。</p>
+          </div>
+          <div class="hidden" id="emptyNoMatch">
+            <div class="empty-icon">🔎</div>
+            <p class="empty-title">暂时没有找到明确地点。</p>
+            <p class="empty-copy">试着保留店名、景点名，或让地点单独占一行。<br>例如：Cafe Verlet、Tivoli Gardens、金泽 黑龍堂</p>
+            <div class="empty-actions">
+              <button class="btn light" id="emptySampleBtn" type="button">填入示例</button>
+              <button class="btn light" id="emptyAddBtn" type="button">手动新增地点</button>
+            </div>
+          </div>
         </div>
         <div class="made-with"><span class="made-text">Made with <span class="love-word">love</span> for travelers.</span><span class="flight-mark" aria-hidden="true"></span></div>
       </div>
@@ -2015,13 +2218,22 @@
     const sourceText = document.querySelector("#sourceText");
     const cityInput = document.querySelector("#cityInput");
     const saveStatus = document.querySelector("#saveStatus");
+    const imageOcrBtn = document.querySelector("#imageOcrBtn");
+    const imageOcrInput = document.querySelector("#imageOcrInput");
+    const ocrRetry = document.querySelector("#ocrRetry");
     const poiBody = document.querySelector("#poiBody");
     const poiCount = document.querySelector("#poiCount");
     const emptyState = document.querySelector("#emptyState");
+    const emptyInitial = document.querySelector("#emptyInitial");
+    const emptyNoMatch = document.querySelector("#emptyNoMatch");
     const tableWrap = document.querySelector("#tableWrap");
     const linkDrawer = document.querySelector("#linkDrawer");
 
     let pois = [];
+    let hasFailedExtraction = false;
+    let ocrScriptPromise = null;
+    let ocrBusy = false;
+    let lastOcrFile = null;
 
     function uid() {
       return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -2114,15 +2326,18 @@
       return { title, area: "", detail: "" };
     }
 
-    function parseRankedPoi(line) {
+    function parseTrailingPageCaptionPoi(line) {
       const raw = String(line || "").trim();
-      if (!/^Nr\.?\s*\d+\s*\.?\s*(?:[:：]\s*)?/i.test(raw)) return null;
-      const title = cleanPoiName(raw
-        .replace(/^Nr\.?\s*\d+\s*\.?\s*(?:[:：]\s*)?/i, "")
-        .replace(/\s*[（(][^）)]*[）)]/g, "")
-        .replace(/\s*(?:图|P)\s*\d+(?:\s*(?:[~\-至到和、]\s*|\s+)\d+)*\s*$/i, ""));
-      if (!title || title.length > 42 || !/^[A-Za-zÀ-ÿ]/.test(title)) return null;
-      return { title, area: "", detail: "" };
+      const match = raw.match(/^(.{2,48}?)\s*[Pp]\s*\d+(?:\s*[-—~至到和、]\s*\d+)?\s*[：:]\s*(.*)$/);
+      if (!match) return null;
+      let title = cleanPoiName(match[1]);
+      const detail = match[2].trim();
+      if (!title || title.length > 42 || looksLikeSentence(title)) return null;
+      if (/^(?:Day|第?\d+天|图片|照片|顶级)$/i.test(title)) return null;
+      if (/^斯蒂芬(?:主教)?$/.test(title)) title = "斯蒂芬主教座堂";
+      if (title === "艺术史博物") title = "艺术史博物馆";
+      if (title === "图书馆博物") title = "图书馆博物馆";
+      return { title, area: "", detail };
     }
 
     function parseCaptionPoi(line) {
@@ -2168,6 +2383,54 @@
       };
     }
 
+    function parseHashPoiLine(line) {
+      const raw = String(line || "").trim();
+      if (!/^#\s+/.test(raw)) return null;
+
+      const content = raw.replace(/^#\s+/, "").trim();
+      const pageMatch = content.match(/^(.*?)(?:\s*[（(]\s*P\d+(?:\s*[-—~至到和、]\s*\d+)?\s*[）)])\s*(.*)$/i);
+      let heading = pageMatch ? pageMatch[1].trim() : content;
+      let detail = pageMatch ? pageMatch[2].trim() : "";
+      let title = "";
+
+      const trailingEnglish = heading.match(/([A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{1,60})$/);
+      if (trailingEnglish) {
+        title = cleanPoiName(trailingEnglish[1]);
+      } else if (!pageMatch) {
+        const inlineEnglish = content.match(/([A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{1,60})(?=[（(，,。.!！?？]|$)/);
+        if (!inlineEnglish) return null;
+        title = cleanPoiName(inlineEnglish[1]);
+        detail = content.slice(inlineEnglish.index + inlineEnglish[1].length).replace(/^[：:，,。.!！?？\s]+/, "").trim();
+      } else {
+        title = cleanPoiName(heading);
+      }
+
+      if (!title || title.length > 54 || looksLikeSentence(title)) return null;
+      return { title, area: "", detail };
+    }
+
+    function isStandalonePageReference(line) {
+      return /^(?:\s*(?:[0-9一二三四五六七八九十]+(?:\uFE0F?\u20E3)?|🔟)\s*)+P\d+(?:\s*[-—~至到和、]\s*\d+)?\s*$/i.test(String(line || ""));
+    }
+
+    function isNarrativeListLine(line) {
+      const raw = String(line || "").trim();
+      if (!/^(?:\s*(?:[0-9一二三四五六七八九十]+(?:\uFE0F?\u20E3)?|🔟)\s*)+/.test(raw)) return false;
+      const text = stripLineMarker(raw);
+      return /(?:刚好|互相|步行可达|可安排|时间有限|推荐以上|基本上|大多|各有特色|下一篇分享|值得看)/.test(text);
+    }
+
+    function parseBilingualPoiLine(line) {
+      const raw = String(line || "").trim();
+      if (!raw || /^[（(]/.test(raw)) return null;
+      const text = stripLineMarker(raw).replace(/\s+/g, " ").trim();
+      const match = text.match(/(?:[\u3400-\u9fff]{1,32}(?:教堂|堂|寺|宫|宮|博物馆|美术馆|城堡|公园|公園|广场|市场|馆|店|咖啡馆|咖啡店|餐厅|飯店))\s*([A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{2,60})$/);
+      if (!match) return null;
+      const title = cleanPoiName(match[1]);
+      if (!title || title.length > 54 || looksLikeSentence(title)) return null;
+      return { title, area: "", detail: "", type: "景点" };
+    }
+
     function cleanCaptionTitle(text) {
       return text
         .split(/[|｜]/)[0]
@@ -2194,7 +2457,7 @@
       const text = String(title || "").trim();
       if (!text) return false;
       if (/^[A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{2,42}$/.test(text) && text.split(/\s+/).length <= 6) return true;
-      return /(?:咖啡|珈琲|餐厅|飯店|饭店|小馆|房|面包店|书店|商店|集合店|市場|市场|集市|美术馆|博物馆|神社|大社|日沉宫|寺|城|峡|島|岛|松岛|公园|公園|花园|广场|喷泉|阶梯|要塞|灯塔|高原|通|温泉|温泉街|站|车站|总站|停车场|案内所|alley|Alley|Gate|Point|Fountain|Stairs|Gelato|Bakery|Cafe|Café|Coffee|COUNTRY|FACE|bread|stories|Store|Market)$/i.test(text);
+      return /(?:咖啡|珈琲|餐厅|飯店|饭店|小馆|房|面包店|书店|商店|集合店|市場|市场|集市|美术馆|博物馆|神社|大社|日沉宫|寺|城|峡|島|岛|松岛|公园|公園|花园|广场|纪念柱|喷泉|阶梯|要塞|灯塔|高原|通|温泉|温泉街|站|车站|总站|停车场|案内所|alley|Alley|Gate|Point|Fountain|Stairs|Gelato|Bakery|Cafe|Café|Coffee|COUNTRY|FACE|bread|stories|Store|Market)$/i.test(text);
     }
 
     function scorePoiCandidate(title, line, nextLine = "", startsBlock = true) {
@@ -2220,6 +2483,9 @@
       const description = (group?.lines || []).join("。");
       if (!title) return true;
       if (isConversationalText(title)) return true;
+      if (isGenericNonPlace(title)) return true;
+      if (group?.isBilingualPoi && title.length <= 54) return false;
+      if (/^#\s+/.test(String(group?.rawLine || "")) && title.length <= 54) return false;
       if (title.length > 42 || looksLikeSentence(title)) return true;
       if (/^(?:to|top\d*|首先top\d*|Nr\.?\s*\d+)$/i.test(title)) return true;
       if (/(?:行程是|路线|打卡照相|谷歌地图)/.test(title)) return true;
@@ -2358,19 +2624,6 @@
           });
         }
       }
-
-      const coffeeMentionPattern = /好评的\s*([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9'’&.\-]*(?:\s+[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9'’&.\-]*){0,4})(?=[，,。])/gi;
-      let coffeeMention;
-      while ((coffeeMention = coffeeMentionPattern.exec(normalized))) {
-        const title = normalizeEmbeddedPoiTitle(coffeeMention[1]);
-        if (!title || seen.has(title)) continue;
-        seen.add(title);
-        groups.push({
-          title,
-          area: city.trim(),
-          lines: [coffeeMention[0]]
-        });
-      }
       return groups;
     }
 
@@ -2413,7 +2666,6 @@
 
       if (!text || text.length < 2 || text.length > 42) return "";
       if (/^(?:Day\d+|Part\d+|友情提示|当天往返|第二天|这里|里面|一楼|二楼|全都|Klook|Google Map)$/i.test(text)) return "";
-      if (/^小鳄鱼$/.test(text)) return "";
       if (/^(?:View Point)$/i.test(text)) return "";
       if (/^(?:餐厅|商店|要塞|咖啡店|面包店|书店|温泉街|老城|老城区|漂亮面包店|车站|神社|灯塔|停车场|巴士停车站|安内所)$/.test(text)) return "";
       if (/^(?:买了|返|作为|但|整条|绝对|餐厅和|商店很多|漂亮|辽阔|古朴|很多|整个|最后我|电车里|之后就是)/.test(text)) return "";
@@ -2439,33 +2691,7 @@
         groups.push({ title: cleaned, area, lines: [detail].filter(Boolean), rawLine, suspicious });
       }
 
-      function addContextualLatinMentions(line) {
-        if (!/(?:买|带回|拿了|逛|咖啡豆|帽子|碗碟|杯子|店里)/.test(line)) return;
-
-        const name = "[A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\\-]*(?:\\s+[A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\\-]*){0,4}";
-        const pairedNames = new RegExp(`(${name}(?:\\s*和\\s*${name})+)\\s*(?:的|在)`);
-        const itemName = new RegExp(`(${name})\\s*的(?:咖啡豆|帽子|碗碟|杯子)`, "g");
-        const leadingName = new RegExp(`^(${name})\\s*(?:还是|也|又|照常|在|店)`);
-
-        const pairMatch = line.match(pairedNames);
-        if (pairMatch) {
-          pairMatch[1].split(/\s*和\s*/).forEach((title) => add(title, line));
-        }
-
-        itemName.lastIndex = 0;
-        let itemMatch;
-        while ((itemMatch = itemName.exec(line))) add(itemMatch[1], line);
-
-        const leadingMatch = line.match(leadingName);
-        if (leadingMatch) add(leadingMatch[1], line);
-      }
-
       for (const line of lines) {
-        addContextualLatinMentions(line);
-
-        const coffeeMention = line.match(/(?:好评的|今年新开的)\s*([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9'’&.\-]*(?:\s+[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9'’&.\-]*){0,4})(?=[，,。])/i);
-        if (coffeeMention && /咖啡|coffee|手冲|flat\s*white/i.test(line)) add(coffeeMention[1], line);
-
         let match = line.match(/^✔️?\s*(?:上午|中午|下午|晚上|早上|傍晚)?\s*[（(]([^）)]{2,42})[）)]\s*[：:，,]?\s*(.*)$/);
         if (match) add(match[1], match[2] || line);
 
@@ -3109,14 +3335,21 @@
       return false;
     }
 
-    function isConversationalText(text) {
-      return /(?:怎么又|为什么|为啥|识别不出来|能不能|请问|帮我看看)/.test(String(text || ""));
+    function isConversationalText(line) {
+      const text = String(line || "").trim();
+      if (!text) return false;
+      if (/^(?:去哪里|哪里|怎么|如何|什么|为什么|能不能|可以吗|有没有|请问|帮我)/.test(text)) return true;
+      return /(?:怎么用|如何使用|使用方法|是什么|去哪里|去哪儿|在哪里|在哪儿|怎么去|如何去|怎么玩|值得吗|好不好|能干嘛|求推荐|求问|谢谢)[？?！!。]?$/.test(text);
+    }
+
+    function isGenericNonPlace(line) {
+      const text = String(line || "").trim();
+      return /(?:啤酒节|音乐节|电影节|文化节|艺术节|美食节|节庆活动|演出活动|旅行攻略|旅行清单|旅行路线|行程安排)$/.test(text);
     }
 
     function isShortPoiCandidate(line, nextLine, inListSection, startsBlock) {
       const cleaned = cleanPoiName(line);
       if (!inListSection || !startsBlock || !cleaned || cleaned.length > 42) return false;
-      if (isConversationalText(cleaned)) return false;
       if (isSectionHeader(line) || isNoiseLine(line) || looksLikeSentence(cleaned)) return false;
       if (nextLine && isSectionHeader(nextLine)) return false;
       if (/^[0-9A-Za-zÀ-ÿ\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af][0-9A-Za-zÀ-ÿ\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af'’&.\-\s（）()・の]+$/.test(cleaned)) return true;
@@ -3127,11 +3360,7 @@
       const raw = line.trim();
       const cleaned = cleanPoiName(raw);
       if (!cleaned || cleaned.length > 54) return false;
-<<<<<<< HEAD
-      if (isConversationalText(cleaned)) return false;
-=======
       if (/^\[[一二三四五六七八九十\d]+R\]/.test(raw)) return false;
->>>>>>> 114b4d64d46bb07a5ba87aa0f9ed4cfb76172c46
       if (isDayHeader(raw)) return false;
       if (isAddressLine(raw)) return false;
       if (parseDetailLine(raw)) return false;
@@ -3167,7 +3396,7 @@
       for (const [type, words] of TYPE_KEYWORDS) {
         if (words.some((word) => lower.includes(word.toLowerCase()))) return type;
       }
-      if (/^.{0,30}(景点|博物馆|美术馆|小巷|石阶|公园|花园|教堂|神社|寺|宫|塔|广场|museum|garden)/i.test(text)) return "景点";
+      if (/^.{0,30}(景点|博物馆|美术馆|小巷|石阶|公园|花园|教堂|神社|寺|宫|塔|广场|纪念柱|museum|garden)/i.test(text)) return "景点";
       return "其他";
     }
 
@@ -3246,6 +3475,19 @@
           continue;
         }
 
+        if (isStandalonePageReference(trimmed)) {
+          if (current) groups.push(current);
+          current = null;
+          startsBlock = true;
+          continue;
+        }
+
+        if (/^[（(].*[）)]\s*$/.test(trimmed)) {
+          if (current) current.lines.push(trimmed.replace(/^[（(]\s*|\s*[）)]$/g, "").trim());
+          startsBlock = false;
+          continue;
+        }
+
         if (isAddressLine(trimmed)) {
           const address = cleanAddressLine(trimmed);
           if (current && address) {
@@ -3266,7 +3508,7 @@
           continue;
         }
 
-        if (isSectionHeader(trimmed)) {
+        if (isSectionHeader(trimmed) && !parseTrailingPageCaptionPoi(trimmed)) {
           if (current) groups.push(current);
           current = null;
           inListSection = true;
@@ -3274,12 +3516,43 @@
           continue;
         }
 
-        const rankedPoi = parseRankedPoi(trimmed);
+        const bilingualPoi = parseBilingualPoiLine(trimmed);
+        if (bilingualPoi && bilingualPoi.title) {
+          if (current) groups.push(current);
+          current = {
+            title: bilingualPoi.title,
+            area: bilingualPoi.area,
+            lines: bilingualPoi.detail ? [bilingualPoi.detail] : [],
+            rawLine: trimmed,
+            type: bilingualPoi.type,
+            isBilingualPoi: true
+          };
+          startsBlock = false;
+          continue;
+        }
+
+        if (isNarrativeListLine(trimmed)) {
+          if (current) groups.push(current);
+          current = null;
+          startsBlock = true;
+          continue;
+        }
+
+        const trailingPageCaptionPoi = parseTrailingPageCaptionPoi(trimmed);
+        const hashPoi = parseHashPoiLine(trimmed);
         const pageSuffixPoi = parsePageSuffixPoi(trimmed);
         const captionPoi = parseCaptionPoi(trimmed);
-        if (rankedPoi && rankedPoi.title) {
+        if (trailingPageCaptionPoi && trailingPageCaptionPoi.title) {
           if (current) groups.push(current);
-          current = { title: rankedPoi.title, area: rankedPoi.area, lines: [], rawLine: trimmed };
+          current = {
+            title: trailingPageCaptionPoi.title,
+            area: trailingPageCaptionPoi.area,
+            lines: trailingPageCaptionPoi.detail ? [trailingPageCaptionPoi.detail] : [],
+            rawLine: trimmed
+          };
+        } else if (hashPoi && hashPoi.title) {
+          if (current) groups.push(current);
+          current = { title: hashPoi.title, area: hashPoi.area, lines: hashPoi.detail ? [hashPoi.detail] : [], rawLine: trimmed };
         } else if (pageSuffixPoi && pageSuffixPoi.title) {
           if (current) groups.push(current);
           current = { title: pageSuffixPoi.title, area: pageSuffixPoi.area, lines: [], rawLine: trimmed };
@@ -3295,12 +3568,15 @@
         startsBlock = false;
       }
       if (current) groups.push(current);
-      appendInlinePois(groups, text, city);
-      appendRouteStopPois(groups, text, city);
-      appendGuideMentionPois(groups, text, city);
-      appendContextMentionPois(groups, text, city);
-      appendDailyListPois(groups, text, city);
-      appendRankedPois(groups, text, city);
+      const hasExplicitStructuredPoi = groups.some((group) => /^#\s+/.test(String(group.rawLine || "")) || group.isBilingualPoi);
+      if (!hasExplicitStructuredPoi) {
+        appendInlinePois(groups, text, city);
+        appendRouteStopPois(groups, text, city);
+        appendGuideMentionPois(groups, text, city);
+        appendContextMentionPois(groups, text, city);
+        appendDailyListPois(groups, text, city);
+        appendRankedPois(groups, text, city);
+      }
 
       if (!groups.length) {
         const inlineTitle = parseInlinePoi(text);
@@ -3312,8 +3588,8 @@
         }
       }
 
-      if (groups.length < 3) appendTravelMentions(groups, text, city);
-      if (groups.length < 3) appendPageReferencePois(groups, text, city);
+      if (groups.length < 3 && !hasExplicitStructuredPoi) appendTravelMentions(groups, text, city);
+      if (groups.length < 3 && !hasExplicitStructuredPoi) appendPageReferencePois(groups, text, city);
 
       if (!groups.length) {
         groups.push(...parseEmbeddedPois(text, city));
@@ -3332,9 +3608,7 @@
           if (titleMatch) {
             const title = cleanPoiName(titleMatch[1]);
             const firstDescription = titleMatch[2] || "";
-            if (title && hasPlaceNameShape(title)) {
-              groups.push({ title, lines: [firstDescription, ...blockLines.slice(1)].filter(Boolean) });
-            }
+            if (title) groups.push({ title, lines: [firstDescription, ...blockLines.slice(1)].filter(Boolean) });
           }
         }
       }
@@ -3355,7 +3629,7 @@
           const inlineArea = trailingArea.area || titleArea.area;
           const description = group.lines.join("。");
           const fullText = `${name} ${description}`;
-          const type = classifyType(fullText);
+          const type = group.type || classifyType(fullText);
           const area = group.area || inlineArea;
           return {
             id: uid(),
@@ -3396,6 +3670,11 @@
       poiCount.textContent = String(pois.length);
     }
 
+    function fitReasonTextarea(textarea) {
+      textarea.style.height = "0px";
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+
     function render() {
       poiBody.innerHTML = "";
       linkDrawer?.classList?.add?.("hidden");
@@ -3404,12 +3683,12 @@
       updateResultSummary();
       emptyState.classList.toggle("hidden", pois.length > 0);
       tableWrap.classList.toggle("hidden", pois.length === 0);
+      emptyInitial.classList.toggle("hidden", hasFailedExtraction);
+      emptyNoMatch.classList.toggle("hidden", !hasFailedExtraction);
 
       for (const poi of pois) {
         const card = document.createElement("article");
         card.className = "place-card";
-        const area = String(poi.area || "").trim();
-        const areaSize = Math.max(4, Math.min(22, Array.from(area).length + 1));
         card.innerHTML = `
           <div class="place-icon" aria-hidden="true">
             <span class="place-pin">📍</span>
@@ -3417,13 +3696,21 @@
           <div class="place-main">
             <div class="place-head">
               <div class="place-name">
-                <input data-field="name" value="${escapeHtml(poi.name)}" aria-label="地点名称">
+                <textarea data-field="name" aria-label="地点名称" rows="1">${escapeHtml(poi.name)}</textarea>
               </div>
-              <select data-field="type" aria-label="类型">
-                ${TYPES.map((type) => `<option value="${type}" ${type === poi.type ? "selected" : ""}>${typeIcon(type)} ${typeLabel(type)}</option>`).join("")}
-              </select>
+              <div class="place-type">
+                <select data-field="type" aria-label="类型">
+                  ${TYPES.map((type) => `<option value="${type}" ${type === poi.type ? "selected" : ""}>${typeIcon(type)} ${typeLabel(type)}</option>`).join("")}
+                </select>
+              </div>
             </div>
-            ${area ? `<div class="place-meta"><div class="place-area"><input data-field="area" value="${escapeHtml(area)}" size="${areaSize}" aria-label="区域或城市"></div></div>` : ""}
+            ${poi.area ? `
+              <div class="place-meta">
+                <div class="place-area">
+                  <input data-field="area" value="${escapeHtml(poi.area)}" aria-label="区域或城市">
+                </div>
+              </div>
+            ` : ""}
             <textarea data-field="reason" aria-label="推荐理由">${escapeHtml(poi.reason)}</textarea>
           </div>
           <div class="place-actions">
@@ -3436,6 +3723,7 @@
         card.querySelectorAll("[data-field]").forEach((field) => {
           field.addEventListener("input", () => {
             poi[field.dataset.field] = field.value;
+            if (field.dataset.field === "reason" || field.dataset.field === "name") fitReasonTextarea(field);
             card.querySelector(".map-link").href = mapUrl(poi);
             updateResultSummary();
             persist();
@@ -3453,6 +3741,8 @@
         });
 
         poiBody.appendChild(card);
+        fitReasonTextarea(card.querySelector('[data-field="name"]'));
+        fitReasonTextarea(card.querySelector('[data-field="reason"]'));
       }
     }
 
@@ -3534,6 +3824,215 @@
         pois
       }));
       saveStatus.textContent = `已保存 ${new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`;
+    }
+
+    function repairOcrPoiName(name) {
+      const cleaned = String(name || "").trim();
+      if (/^斯蒂芬(?:主教)?$/.test(cleaned)) return "斯蒂芬主教座堂";
+      if (cleaned === "艺术史博物") return "艺术史博物馆";
+      if (cleaned === "图书馆博物") return "图书馆博物馆";
+      return cleaned;
+    }
+
+    function isLikelyOcrPoi(poi) {
+      const name = String(poi?.name || "").trim();
+      if (!name) return false;
+      if (/(?:\b5G\b|\bLTE\b|\bspspom\b|\ball\s*5G\b|关注|说点什么|点赞|收藏|评论|转发)/i.test(name)) return false;
+      if (/^\s*(?:\d{1,2}:\d{2}|[\d\s]+)\s*$/.test(name)) return false;
+      if (/^(?:似乎是|没进去|无限符号|如果只来|无论内外|内部也|剩下的|门票|免费参观|路过|属于|大概|再有机会)/.test(name)) return false;
+      if (/[。！？!？]/.test(name)) return false;
+      const latinWords = name.match(/[A-Za-zÀ-ÿ]+/g) || [];
+      if (/[\u3400-\u9fff]/.test(name) && latinWords.some((word) => word.length === 1)) return false;
+      return true;
+    }
+
+    function splitOcrRoutePoi(poi) {
+      const name = String(poi?.name || "").trim();
+      if (!/[—–]/.test(name) || name.length < 18) return [poi];
+      const segments = name
+        .replace(/(广场)(霍夫堡|国会大厦|市政厅|教堂|图书馆)/g, "$1|$2")
+        .split(/[—–|]/)
+        .map((item) => item.trim())
+        .filter((item) => item && (hasPlaceNameShape(item) || /(?:霍夫堡|国会大厦|市政厅)$/.test(item)));
+      return segments.length > 1
+        ? segments.map((item) => ({ ...poi, id: uid(), name: item }))
+        : [poi];
+    }
+
+    function normalizeOcrPoi(poi) {
+      const name = repairOcrPoiName(poi.name);
+      const area = /(?:属于|路过|推荐|如果|内部|无论|免费|门票|值得|景点)/.test(poi.area || "") ? "" : poi.area;
+      if (/^(?:如果只来|无论内外)/.test(name) && hasPlaceNameShape(area)) {
+        return { ...poi, name: area, area: "" };
+      }
+      return { ...poi, name, area };
+    }
+
+    function extractPlaces(fromOcr = false) {
+      const hasSource = Boolean(sourceText.value.trim());
+      let extracted = hasSource ? parsePois(sourceText.value, cityInput.value) : [];
+      if (fromOcr) {
+        extracted = extracted
+          .map(normalizeOcrPoi)
+          .flatMap(splitOcrRoutePoi)
+          .filter(isLikelyOcrPoi)
+          .filter((poi, index, list) => list.findIndex((item) => item.name === poi.name) === index);
+      }
+      pois = extracted.length ? extracted : pois;
+      hasFailedExtraction = hasSource && !extracted.length && !pois.length;
+      render();
+      persist();
+      saveStatus.textContent = extracted.length ? `已提取 ${extracted.length} 个地点` : "";
+      return extracted;
+    }
+
+    function loadOcrEngine() {
+      if (window.Tesseract) return Promise.resolve(window.Tesseract);
+      if (ocrScriptPromise) return ocrScriptPromise;
+
+      ocrScriptPromise = new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+        script.async = true;
+        script.onload = () => window.Tesseract ? resolve(window.Tesseract) : reject(new Error("OCR 初始化失败"));
+        script.onerror = () => reject(new Error("OCR 组件加载失败"));
+        document.head.appendChild(script);
+      });
+      return ocrScriptPromise;
+    }
+
+    function cleanOcrText(text) {
+      let cleaned = String(text || "").replace(/\r/g, "");
+      for (let pass = 0; pass < 6; pass += 1) {
+        const next = cleaned
+          .replace(/([\u3400-\u9fff\u3040-\u30ff\uac00-\ud7af])\s+([\u3400-\u9fff\u3040-\u30ff\uac00-\ud7af])/g, "$1$2")
+          .replace(/([\u3400-\u9fff\u3040-\u30ff\uac00-\ud7af])\s+([，。！？；：、】【（）])/g, "$1$2")
+          .replace(/([（(【])\s+/g, "$1")
+          .replace(/\s+([）)】])/g, "$1");
+        if (next === cleaned) break;
+        cleaned = next;
+      }
+
+      return cleaned
+        .split(/\n+/)
+        .map((line) => line.replace(/\s{2,}/g, " ").trim())
+        .filter((line) => line && !/(?:关注|说点什么|点赞|收藏|评论|转发|准备中|送达|\b5G\b|^\s*\d{1,2}:\d{2}\s*$)/i.test(line))
+        .join("\n\n");
+    }
+
+    function inferOcrLanguage(text) {
+      const value = String(text || "");
+      const kanaCount = (value.match(/[ぁ-んァ-ン]/g) || []).length;
+      const hangulCount = (value.match(/[가-힣]/g) || []).length;
+      if (hangulCount >= 3) return "kor+eng";
+      if (kanaCount >= 3) return "jpn+eng";
+      return "chi_sim+eng";
+    }
+
+    async function prepareScreenshotForOcr(file) {
+      const imageUrl = URL.createObjectURL(file);
+      try {
+        const image = await new Promise((resolve, reject) => {
+          const element = new Image();
+          element.onload = () => resolve(element);
+          element.onerror = reject;
+          element.src = imageUrl;
+        });
+        // Phone screenshots usually reserve the first section for the status bar and post header.
+        const cropTop = image.naturalHeight / image.naturalWidth > 1.45
+          ? Math.round(image.naturalHeight * 0.16)
+          : 0;
+        const sourceWidth = image.naturalWidth;
+        const sourceHeight = image.naturalHeight - cropTop;
+        const sourcePixels = sourceWidth * sourceHeight;
+        const scale = Math.min(1.45, Math.max(1, Math.sqrt(6000000 / sourcePixels)));
+        const width = Math.round(sourceWidth * scale);
+        const height = Math.round(sourceHeight * scale);
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const context = canvas.getContext("2d", { willReadFrequently: true });
+        context.drawImage(image, 0, cropTop, sourceWidth, sourceHeight, 0, 0, width, height);
+
+        const pixels = context.getImageData(0, 0, width, height);
+        for (let index = 0; index < pixels.data.length; index += 4) {
+          const luminance = pixels.data[index] * 0.299 + pixels.data[index + 1] * 0.587 + pixels.data[index + 2] * 0.114;
+          const enhanced = Math.max(0, Math.min(255, (luminance - 128) * 1.18 + 128));
+          pixels.data[index] = enhanced;
+          pixels.data[index + 1] = enhanced;
+          pixels.data[index + 2] = enhanced;
+        }
+        context.putImageData(pixels, 0, 0);
+
+        return await new Promise((resolve, reject) => {
+          canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("截图优化失败")), "image/png");
+        });
+      } finally {
+        URL.revokeObjectURL(imageUrl);
+      }
+    }
+
+    async function recognizeScreenshot(file, language = "auto") {
+      if (!file || ocrBusy) return;
+      lastOcrFile = file;
+      ocrBusy = true;
+      imageOcrBtn.disabled = true;
+      imageOcrBtn.innerHTML = "<span>正在识别截图…</span><small>请稍候</small>";
+      saveStatus.textContent = "正在准备本地识别…";
+
+      let worker;
+      try {
+        const Tesseract = await loadOcrEngine();
+        saveStatus.textContent = "正在优化截图…";
+        const imageForOcr = await prepareScreenshotForOcr(file);
+        let activeLanguage = language === "auto" ? "chi_sim+eng" : language;
+        worker = await Tesseract.createWorker(activeLanguage, 1, {
+          logger: (message) => {
+            if (message.status === "recognizing text" && Number.isFinite(message.progress)) {
+              saveStatus.textContent = `正在识别截图 ${Math.round(message.progress * 100)}%`;
+            } else if (message.status) {
+              saveStatus.textContent = "正在准备识别语言…";
+            }
+          }
+        });
+        await worker.setParameters({
+          tessedit_pageseg_mode: Tesseract.PSM?.SINGLE_BLOCK || 6
+        });
+        let { data } = await worker.recognize(imageForOcr);
+        if (language === "auto") {
+          const inferredLanguage = inferOcrLanguage(data?.text);
+          if (inferredLanguage !== activeLanguage) {
+            saveStatus.textContent = "检测到其他语言，正在调整识别…";
+            await worker.reinitialize(inferredLanguage, 1);
+            await worker.setParameters({
+              tessedit_pageseg_mode: Tesseract.PSM?.SINGLE_BLOCK || 6
+            });
+            activeLanguage = inferredLanguage;
+            ({ data } = await worker.recognize(imageForOcr));
+          }
+        }
+        const recognizedText = cleanOcrText(data?.text);
+        if (!recognizedText) {
+          saveStatus.textContent = "没有读到文字，试试更清晰的截图";
+          return;
+        }
+
+        sourceText.value = recognizedText;
+        const extracted = extractPlaces(true);
+        saveStatus.textContent = extracted.length
+          ? `已识别文字并提取 ${extracted.length} 个地点`
+          : "文字已识别，请检查后再提取地点";
+        ocrRetry.classList.remove("hidden");
+      } catch (error) {
+        console.error(error);
+        saveStatus.textContent = "截图识别失败，请检查网络或换一张更清晰的截图";
+      } finally {
+        if (worker) await worker.terminate();
+        ocrBusy = false;
+        imageOcrBtn.disabled = false;
+        imageOcrBtn.innerHTML = "<span>上传截图识别</span><small>自动识别语言</small>";
+        imageOcrInput.value = "";
+      }
     }
 
     function loadSaved() {
@@ -3619,21 +4118,26 @@
       }
     }
 
-    document.querySelector("#extractBtn").addEventListener("click", () => {
-      const extracted = parsePois(sourceText.value, cityInput.value);
-      pois = extracted.length ? extracted : pois;
-      render();
-      persist();
-      saveStatus.textContent = extracted.length ? `已提取 ${extracted.length} 个地点` : "未识别到新地点";
+    document.querySelector("#extractBtn").addEventListener("click", extractPlaces);
+
+    imageOcrBtn.addEventListener("click", () => imageOcrInput.click());
+    imageOcrInput.addEventListener("change", () => recognizeScreenshot(imageOcrInput.files?.[0]));
+    ocrRetry.addEventListener("click", (event) => {
+      const language = event.target.closest("[data-ocr-language]")?.dataset.ocrLanguage;
+      if (language && lastOcrFile) recognizeScreenshot(lastOcrFile, language);
     });
 
     document.querySelector("#sampleBtn").addEventListener("click", () => {
       sourceText.value = SAMPLE_TEXT;
       cityInput.value = cityInput.value || "Paris";
+      hasFailedExtraction = false;
+      render();
       persist();
     });
 
     document.querySelector("#addBtn").addEventListener("click", addBlankPoi);
+    document.querySelector("#emptySampleBtn").addEventListener("click", () => document.querySelector("#sampleBtn").click());
+    document.querySelector("#emptyAddBtn").addEventListener("click", addBlankPoi);
     document.querySelector("#csvBtn").addEventListener("click", downloadCsv);
     document.querySelector("#copyLinksBtn").addEventListener("click", copyAllLinks);
 
@@ -3641,6 +4145,9 @@
       sourceText.value = "";
       cityInput.value = "";
       pois = [];
+      hasFailedExtraction = false;
+      lastOcrFile = null;
+      ocrRetry.classList.add("hidden");
       localStorage.removeItem(STORAGE_KEY);
       render();
       saveStatus.textContent = "已清空";
@@ -3648,7 +4155,11 @@
 
     document.querySelector("#openAllBtn").addEventListener("click", openAllLinks);
 
-    sourceText.addEventListener("input", persist);
+    sourceText.addEventListener("input", () => {
+      hasFailedExtraction = false;
+      render();
+      persist();
+    });
     cityInput.addEventListener("input", () => {
       updateResultSummary();
       persist();

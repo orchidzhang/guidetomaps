@@ -1,0 +1,7 @@
+{
+  "name": "single-hash-place",
+  "city": "",
+  "input": "# 新港Nyhavn(P1-2) 彩房子城市地标",
+  "expectedPois": ["Nyhavn"],
+  "unexpectedPois": ["新港Nyhavn"]
+}

@@ -1,0 +1,7 @@
+{
+  "name": "no-poi-questions",
+  "city": "",
+  "input": "去哪里怎么用\n啤酒节",
+  "expectedPois": [],
+  "unexpectedPois": ["去哪里怎么用", "啤酒节"]
+}
