@@ -1,0 +1,22 @@
+{
+  "name": "munich-coffee-addresses",
+  "city": "慕尼黑",
+  "input": "这次德国出差整理出很满意的咖啡店，每一家都有特色产品！跟随图片看下：\n\t\n1️⃣The Barn\n图1-2，慕尼黑有几家分店，就近选择就可以\n地址：Tal 15, 80331 München 是我去的这家\n必点：手冲！真的是出品超稳定[点赞R]\n\t\n2️⃣Kanso Coffee Lab\n图3-5 在慕尼黑最市中心的地方\n地址：Theatinerstraße 35, Residenzpassage, Innenhof, 80333 München\n必点：都好喝都可以冲！特别是咖啡杯很有特色，买了几个送朋友[色色R]\n\t\n3️⃣ The Annamites Coffee Roasters\n图6-7 距离市中心有一点点远\n地址：Fallstraße 26, 81369 München\n特色：越南咖啡\n这家也是我这次去培训的一家，他们主打越南咖啡豆；有一款利比利卡拼配非常出乎意料的好喝！特别是简餐也很好吃[喝奶茶R]",
+  "expectedPois": [
+    "The Barn",
+    "Kanso Coffee Lab",
+    "The Annamites Coffee Roasters"
+  ],
+  "unexpectedPois": [
+    "在慕尼黑最市中心的地方",
+    "距离市中心有一点点远",
+    "慕尼黑有几家分店",
+    "手冲",
+    "越南咖啡"
+  ],
+  "forbiddenMapTerms": [
+    "在慕尼黑最市中心的地方",
+    "距离市中心有一点点远",
+    "是我去的这家"
+  ]
+}

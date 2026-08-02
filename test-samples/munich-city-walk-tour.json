@@ -1,0 +1,32 @@
+{
+  "name": "munich-city-walk-tour",
+  "city": "慕尼黑",
+  "input": "第一天的行程是city walk。\n让chatgpt帮我设计了一个可以打卡照相的路线，\n然后直接可以在谷歌地图上打开。\n所有大的景点都走到了。如下：\n\t\n第一站：Karlsplatz（卡尔广场 / Stachus）\n从这里穿过城门，正式进入慕尼黑老城区。\n⸻\n第二站：Frauenkirche（圣母教堂）\n这是慕尼黑最著名的地标。\n⸻\n第三站：Marienplatz（玛利亚广场）\n慕尼黑真正的市中心。\n⸻\n第四站：Viktualienmarkt（谷物市场）\n⸻\n第五站：Munich Residenz（慕尼黑王宫）\n这里曾经是巴伐利亚王室所在地。\n⸻\n第六站：Odeonsplatz（奥迪翁广场）\n慕尼黑最有气质的广场\n⸻\n第七站：English Garden（英国花园）\n这是欧洲最大的城市公园之一\n\t\n第八站：St. Peter’s Church（圣彼得教堂塔楼）\n一定要爬塔，可以俯瞰整个城市\n\t\n第二天的行程是报了个tour去看新天鹅堡。\n早晨九点从慕尼黑出发，\n晚上7点半左右送回来。\nLinderhof和壁画村也去了。\n整个行程也不觉得很紧凑，\n有很多时间走走停停，拍照打卡。",
+  "expectedPois": [
+    "Karlsplatz",
+    "Frauenkirche",
+    "Marienplatz",
+    "Viktualienmarkt",
+    "Munich Residenz",
+    "Odeonsplatz",
+    "English Garden",
+    "St. Peter’s Church",
+    "新天鹅堡",
+    "Linderhof",
+    "壁画村"
+  ],
+  "unexpectedPois": [
+    "第二天的行程是报了个tour去看新天鹅堡",
+    "卡尔广场",
+    "Stachus",
+    "圣母教堂",
+    "玛利亚广场",
+    "谷物市场",
+    "慕尼黑王宫",
+    "奥迪翁广场",
+    "英国花园",
+    "圣彼得教堂塔楼",
+    "慕尼黑最有气质的广场",
+    "这是欧洲最大的城市公园"
+  ]
+}

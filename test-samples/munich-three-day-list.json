@@ -1,0 +1,43 @@
+{
+  "name": "munich-three-day-list",
+  "city": "慕尼黑",
+  "input": "第一天：\n🥨 Rischart Bakery 连锁店，很容易看到，面包好吃不贵😘\n- Olympiapark München （一个公园）\n- ⁠BMW Welt （免费观光）\n- ⁠BMW Museum （星期一关，门票🎫10欧）\n🍖 Restaurant Augustiner Klosterwirt （点猪蹄与薯泥，苹果馅饼😋）\n- ⁠English Garden （很多本地人在这里聚会，野餐，晒🌞）\n- ⁠Eisbachwelle （河边冲浪🏄‍♀️）\n\t\n第二天：\n- Asam Church\n🍬 Bears & Friends （买小熊软糖，蜂蜜口味）\n🍩 Schmalznudel - Cafe Frischhut （德国甜甜圈，星期日关）\n- ⁠Viktualienmarkt （当地市集）\n- ⁠Juliet Capulet Statue （摸她又🐻，带🍀）\n- ⁠St. Peter’s Church\n- ⁠Marienplatz Square （木偶表演早上11，下午12，5点）\n- ⁠Frauenkirche （圣母教堂）\n- ⁠Old town\n- ⁠Munchner Residenz （慕尼黑王宫）\n- ⁠Odeonsplatz\n- ⁠Hofgarten （王宫花园）\n🌭🥞Kaisergarten (来尝尝德国百肠，皇帝煎饼）*德国白肠是当地的早餐，可是这里有卖到4pm)\n\t\n第三天 ：\n我们在慕尼黑只有两天，如果你还有一天可以去新天鹅堡🏰\n- Neuschwanstein Castle 新天鹅堡🏰\n可以步行上山，也能坐马车（约8欧🐎）",
+  "expectedPois": [
+    "Rischart Bakery",
+    "Olympiapark München",
+    "BMW Welt",
+    "BMW Museum",
+    "Restaurant Augustiner Klosterwirt",
+    "English Garden",
+    "Eisbachwelle",
+    "Asam Church",
+    "Bears & Friends",
+    "Schmalznudel - Cafe Frischhut",
+    "Viktualienmarkt",
+    "Juliet Capulet Statue",
+    "St. Peter’s Church",
+    "Marienplatz Square",
+    "Frauenkirche",
+    "Old town",
+    "Munchner Residenz",
+    "Odeonsplatz",
+    "Hofgarten",
+    "Kaisergarten",
+    "Neuschwanstein Castle"
+  ],
+  "unexpectedPois": [
+    "一个公园",
+    "免费观光",
+    "星期一关，门票🎫10欧",
+    "河边冲浪",
+    "买小熊软糖，蜂蜜口味",
+    "德国甜甜圈，星期日关",
+    "当地市集",
+    "摸她又🐻，带",
+    "木偶表演早上11，下午12，5点",
+    "圣母教堂",
+    "慕尼黑王宫",
+    "王宫花园",
+    "新天鹅堡"
+  ]
+}

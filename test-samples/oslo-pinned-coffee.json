@@ -1,0 +1,7 @@
+{
+  "name": "oslo-pinned-coffee",
+  "city": "Oslo",
+  "input": "📍Tim Wendelboe\n世界咖啡冠军 Tim Wendelboe 创立，也是北欧浅烘(nordic roasting)的代表。我点了 pour-over但是用Aeropress 做的，以及夏季限定 Cappuccino Al Freddo。对于客流量多的情况Aeropress 更好控制变量，也理解。豆子的花香、果香和甜感表现得特别干净。Al Freddo 灵感来自希腊经典冰咖啡，入口绵密顺滑，却依然保留浅烘 Espresso 明亮的酸甜，夏天必点。\n\n📍Supreme Roastworks\n距离Tim步行距离。它家是本地烘焙豆商之一，用的传统V60做pour-over，一切极简，遵循最基本的咖啡冲煮方法。单品咖啡常能喝到莓果、热带水果和发酵香气，层次丰富却依然平衡，每一口都有惊喜。\n\n📍Fuglen\n除了招牌 Freppo，也一定要试试挪威特色 Brown Cheese（Brunost 棕芝士）。Freppo 受到希腊 Freddo 的启发，以双份 Espresso 摇打出绵密泡沫，没有过多配料，却把北欧浅烘的柑橘、莓果、花香完整呈现，咖啡感十足，是我这趟最喜欢的一杯冰咖啡。离开前又买了一杯热拿铁，搭配挪威本地 TINE 全脂牛奶，奶香浓郁又不会盖过咖啡风味。",
+  "expectedPois": ["Tim Wendelboe", "Supreme Roastworks", "Fuglen"],
+  "unexpectedPois": []
+}
