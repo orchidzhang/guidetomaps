@@ -1,0 +1,29 @@
+{
+  "name": "munich-city-landmarks-numbered",
+  "city": "慕尼黑",
+  "input": "🇩🇪慕尼黑｜一天如何快速打卡市区所有景点\n如果你想一天时间快速打卡慕尼黑市区所有景点，可以参考这份路线图[棒R]起点是玛丽亚广场❗️\n\n1️⃣慕尼黑市政厅New Town Hall\n-市政厅11.12.17点钟表木偶小人表演🎭\n\n2️⃣早餐🍳：Rischart Café am Marienplatz\n-这家分店很多，可以就近选择[得意R]\n-强烈推荐白色葱花奶酪卷卷，非常香，很美味！\n\n3️⃣咖啡☕️：Man versus Machine Coffee Roasters\n-📍Müllerstraße 23, 80469 München, Germany\n-非常好喝！美味咖啡开启一天！\n\n4️⃣慕尼黑王宫&珍宝馆Munich Residence👑\n-早上10点一开门就去不排队\n-游览时间：王宫2-3h，珍宝馆30-40mins\n\n5️⃣老绘画陈列馆Alte Pinakothek\n-存包🛅需要0.5€硬币🪙，进门直走柜台买票\n-不允许❎携带液体、口红💄\n\n6️⃣圣弥额尔教堂St. Michael München\n-📍 Neuhauser Str. 6, 80333 München, Germany\n-阿尔卑斯山以北最大的文艺复兴式教堂⛪️\n\n7️⃣阿桑教堂Asamkirche\n-📍 Sendlinger Str. 32, 80331 München, Germany\n-开放时间好像有限制，去之前查一下\n-小小的地方极致的奢华，慕尼黑洛可可风格巅峰之作[星R]\n\n8️⃣圣彼得教堂登顶St. Peter\n-📍 Peterspl. 1, 80331 München, Germany\n-登顶成人5€，可俯瞰慕尼黑全城\n\n9️⃣圣母教堂Frauenkirche\n-📍 Frauenplatz 1, 80331 München, Germany\n-慕尼黑最大的教堂⛪️，和新市政厅并为市区两大地标\n\n1️⃣0️⃣朱丽叶雕像Juliet Capulet Statue\n-📍 Marienplatz 15, 80331 München, Germany\n-脱单许愿池\n\n1️⃣1️⃣Hofbräuhaus München啤酒厂🍺\n-📍 Platzl 9, 80331 München, Germany\n-慕尼黑最著名的啤酒厂，其历史可以追溯到1589年",
+  "expectedPois": [
+    "New Town Hall",
+    "Rischart Café am Marienplatz",
+    "Man versus Machine Coffee Roasters",
+    "Munich Residence",
+    "Alte Pinakothek",
+    "St. Michael München",
+    "Asamkirche",
+    "St. Peter",
+    "Frauenkirche",
+    "Juliet Capulet Statue",
+    "Hofbräuhaus München"
+  ],
+  "unexpectedPois": [
+    "早餐",
+    "咖啡",
+    "慕尼黑王宫",
+    "老绘画陈列馆",
+    "圣弥额尔教堂",
+    "阿桑教堂",
+    "圣彼得教堂登顶",
+    "圣母教堂",
+    "朱丽叶雕像"
+  ]
+}

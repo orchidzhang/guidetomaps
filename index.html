@@ -2431,6 +2431,19 @@
       return { title, area: "", detail: "", type: "景点" };
     }
 
+    function parseNumberedBilingualPoiLine(line) {
+      const raw = String(line || "").trim();
+      if (!/^(?:(?:[0-9]\uFE0F?\u20E3|🔟)\s*)+/.test(raw)) return null;
+      const text = stripLineMarker(raw)
+        .replace(/^(?:早餐|早午餐|午餐|晚餐|咖啡|甜品|面包)[^：:]{0,8}[：:]\s*/, "")
+        .trim();
+      const matches = [...text.matchAll(/[A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{2,60}/g)]
+        .map((match) => cleanPoiName(match[0]));
+      const title = matches.sort((left, right) => right.length - left.length)[0] || "";
+      if (!title || title.length > 54 || title.split(/\s+/).length > 7) return null;
+      return { title, area: "", detail: "" };
+    }
+
     function cleanCaptionTitle(text) {
       return text
         .split(/[|｜]/)[0]
@@ -2441,7 +2454,7 @@
 
     function stripLineMarker(line) {
       return String(line || "")
-        .replace(/^\s*(?:[0-9一二三四五六七八九十]+(?:\uFE0F?\u20E3)?|🔟)\s*/, "")
+        .replace(/^\s*(?:(?:[0-9]\uFE0F?\u20E3|🔟)\s*)+/, "")
         .replace(/^\s*[\d一二三四五六七八九十]+[.)、．-]\s*/, "")
         .replace(/^\s*[#*•·\-–—|｜>]+\s*/, "")
         .replace(/^\s*[^\dA-Za-zÀ-ÿ\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af\s]+\s*/, "")
@@ -3516,16 +3529,31 @@
           continue;
         }
 
+        if (current?.isNumberedPoi && /^[-–—]\s*/.test(trimmed)) {
+          const bullet = trimmed.replace(/^[-–—]\s*/, "").trim();
+          if (isAddressLine(bullet)) {
+            const address = cleanAddressLine(bullet);
+            if (address) current.area = current.area || address;
+          } else if (bullet) {
+            current.lines.push(bullet);
+          }
+          startsBlock = false;
+          continue;
+        }
+
+        const numberedBilingualPoi = parseNumberedBilingualPoiLine(trimmed);
         const bilingualPoi = parseBilingualPoiLine(trimmed);
-        if (bilingualPoi && bilingualPoi.title) {
+        if (numberedBilingualPoi?.title || bilingualPoi?.title) {
           if (current) groups.push(current);
+          const parsedPoi = numberedBilingualPoi || bilingualPoi;
           current = {
-            title: bilingualPoi.title,
-            area: bilingualPoi.area,
-            lines: bilingualPoi.detail ? [bilingualPoi.detail] : [],
+            title: parsedPoi.title,
+            area: parsedPoi.area,
+            lines: parsedPoi.detail ? [parsedPoi.detail] : [],
             rawLine: trimmed,
-            type: bilingualPoi.type,
-            isBilingualPoi: true
+            type: parsedPoi.type,
+            isBilingualPoi: Boolean(bilingualPoi),
+            isNumberedPoi: Boolean(numberedBilingualPoi)
           };
           startsBlock = false;
           continue;
