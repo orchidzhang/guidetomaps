@@ -1,0 +1,6 @@
+{
+  "name": "shenzhen-recommendation",
+  "input": "深圳世界之窗真的很值得一去",
+  "expectedPois": ["深圳世界之窗"],
+  "unexpectedPois": []
+}

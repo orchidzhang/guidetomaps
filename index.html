@@ -2107,6 +2107,38 @@
         font-size: 12px;
       }
     }
+
+    .map-provider-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 42px;
+      padding: 0 10px 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 680;
+    }
+
+    .map-provider-control select {
+      min-height: 30px;
+      padding: 4px 24px 4px 4px;
+      border: 0;
+      border-radius: 0;
+      background-color: transparent;
+      color: var(--ink);
+      font: inherit;
+      appearance: auto;
+    }
+
+    @media (max-width: 700px) {
+      .map-provider-control {
+        grid-column: 1 / -1;
+        justify-content: space-between;
+      }
+    }
   </style>
 </head>
 <body>
@@ -2130,7 +2162,7 @@
           <label for="cityInput">城市（可选）</label>
           <input id="cityInput" type="text">
         </div>
-        <textarea id="sourceText" placeholder="粘贴小红书、博客、Reddit、公众号或 ChatGPT 旅行内容。&#10;我会提取地点，并生成 Google Maps 链接。"></textarea>
+        <textarea id="sourceText" placeholder="粘贴小红书、博客、Reddit、公众号或 ChatGPT 旅行内容。&#10;我会提取地点，并生成地图链接。"></textarea>
 
         <div class="actions">
           <button class="btn primary" id="extractBtn" type="button">提取地点</button>
@@ -2159,6 +2191,7 @@
             <h2 class="result-heading" id="resultHeading">地点清单 <span class="count" id="poiCount">0</span></h2>
           </div>
           <div class="toolbar-actions">
+            <label class="map-provider-control" for="mapProvider"><span>地图</span><select id="mapProvider" aria-label="地图服务"><option value="auto">智能选择</option><option value="amap">高德地图</option><option value="google">Google Maps</option></select></label>
             <button class="tool-btn" id="csvBtn" type="button"><span class="tool-icon">⇩</span><span>导出 CSV</span></button>
             <button class="tool-btn" id="copyLinksBtn" type="button"><span class="tool-icon">⧉</span><span>复制全部</span></button>
             <button class="tool-btn" id="openAllBtn" type="button"><span class="tool-icon">↗</span><span>打开全部</span></button>
@@ -2204,7 +2237,7 @@
     const AREA_PATTERNS = [
       /(Châtelet\s*-\s*Les Halles|Rue Saint-Honoré|Marais|Le Marais|Shibuya|Shinjuku|Ginza|Harajuku|Montmartre|Louvre)/i,
       /([A-Za-zÀ-ÿ'’.\-\s]+(?:Street|St\.|Rue|Avenue|Ave\.|Road|Rd\.|Lane|Plaza|Square|Market))/i,
-      /([\u4e00-\u9fa5A-Za-zÀ-ÿ'’.\-\s]+(?:区|街|附近|周边|路|广场|商圈|车站|花园|公园|宫|馆|站))/
+      /(?:坐落在|位于|位置在|靠近|附近是|在)([\u4e00-\u9fa5A-Za-zÀ-ÿ'’.\-\s]{2,24}?(?:区|街|附近|周边|路|广场|商圈|车站|花园|公园|宫|馆|站))/
     ];
     const SAMPLE_TEXT = `🤍Partisan Café Artisanal
 玛黑区的时髦人有一半都在这家咖啡店，时尚浓度超高。
@@ -2217,6 +2250,7 @@
 
     const sourceText = document.querySelector("#sourceText");
     const cityInput = document.querySelector("#cityInput");
+    const mapProviderInput = document.querySelector("#mapProvider");
     const saveStatus = document.querySelector("#saveStatus");
     const imageOcrBtn = document.querySelector("#imageOcrBtn");
     const imageOcrInput = document.querySelector("#imageOcrInput");
@@ -2234,6 +2268,7 @@
     let ocrScriptPromise = null;
     let ocrBusy = false;
     let lastOcrFile = null;
+    let mapProvider = "auto";
 
     function uid() {
       return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -2243,7 +2278,7 @@
       return line
         .replace(/^\s*\[[^\]]{1,12}R\]\s*/i, "")
         .replace(/\s*[^\dA-Za-zÀ-ÿ\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]*\s*P\d+(?:\s*[-—~至到和、]\s*\d+)?\s*$/i, "")
-        .replace(/^(?:\s*(?:[0-9一二三四五六七八九十]+(?:\uFE0F?\u20E3)?|🔟)\s*)+/, "")
+        .replace(/^(?:\s*(?:(?:\d+\uFE0F?\u20E3|🔟)\s*|(?:\d+|[一二三四五六七八九十]+)\s+))+/, "")
         .replace(/^[\s\d一二三四五六七八九十]+[.)、．-]\s*/, "")
         .replace(/^[\s#*•·\-–—|｜>]+/, "")
         .replace(/^[^0-9A-Za-zÀ-ÿ\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]+/, "")
@@ -2470,7 +2505,7 @@
       const text = String(title || "").trim();
       if (!text) return false;
       if (/^[A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\-\s]{2,42}$/.test(text) && text.split(/\s+/).length <= 6) return true;
-      return /(?:咖啡|珈琲|餐厅|飯店|饭店|小馆|房|面包店|书店|商店|集合店|市場|市场|集市|美术馆|博物馆|神社|大社|日沉宫|寺|城|峡|島|岛|松岛|公园|公園|花园|广场|纪念柱|喷泉|阶梯|要塞|灯塔|高原|通|温泉|温泉街|站|车站|总站|停车场|案内所|alley|Alley|Gate|Point|Fountain|Stairs|Gelato|Bakery|Cafe|Café|Coffee|COUNTRY|FACE|bread|stories|Store|Market)$/i.test(text);
+      return /(?:咖啡|珈琲|餐厅|飯店|饭店|小馆|房|面包店|书店|商店|集合店|市場|市场|集市|美术馆|博物馆|神社|大社|日沉宫|寺|城|峡|島|岛|松岛|古镇|故居|公园|公園|花园|广场|纪念柱|喷泉|阶梯|要塞|灯塔|高原|通|温泉|温泉街|站|车站|总站|停车场|案内所|世界之窗|alley|Alley|Gate|Point|Fountain|Stairs|Gelato|Bakery|Cafe|Café|Coffee|COUNTRY|FACE|bread|stories|Store|Market)$/i.test(text);
     }
 
     function scorePoiCandidate(title, line, nextLine = "", startsBlock = true) {
@@ -2499,6 +2534,8 @@
       if (isGenericNonPlace(title)) return true;
       if (group?.isBilingualPoi && title.length <= 54) return false;
       if (/^#\s+/.test(String(group?.rawLine || "")) && title.length <= 54) return false;
+      if (/^\d{1,2}点$/.test(title)) return true;
+      if (/^(?:看点|推荐|地址|位置|午餐|晚餐|早餐|小贴士|小建议|行程|路线|交通)$/.test(title)) return true;
       if (title.length > 42 || looksLikeSentence(title)) return true;
       if (/^(?:to|top\d*|首先top\d*|Nr\.?\s*\d+)$/i.test(title)) return true;
       if (/(?:行程是|路线|打卡照相|谷歌地图)/.test(title)) return true;
@@ -2704,7 +2741,27 @@
         groups.push({ title: cleaned, area, lines: [detail].filter(Boolean), rawLine, suspicious });
       }
 
+      function addContextualLatinMentions(line) {
+        if (!/(?:买|带回|拿了|逛|咖啡豆|帽子|碗碟|杯子|店里)/.test(line)) return;
+        const name = "[A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\\-]*(?:\\s+[A-ZÀ-Þ][A-Za-zÀ-ÿ0-9'’&.\\-]*){0,4}";
+        const pairedNames = new RegExp(`(${name}(?:\\s*和\\s*${name})+)\\s*(?:的|在)`);
+        const itemName = new RegExp(`(${name})\\s*的(?:咖啡豆|帽子|碗碟|杯子)`, "g");
+        const leadingName = new RegExp(`^(${name})\\s*(?:还是|也|又|照常|在|店)`);
+        const pairMatch = line.match(pairedNames);
+        if (pairMatch) pairMatch[1].split(/\s*和\s*/).forEach((title) => add(title, line));
+        itemName.lastIndex = 0;
+        let itemMatch;
+        while ((itemMatch = itemName.exec(line))) add(itemMatch[1], line);
+        const leadingMatch = line.match(leadingName);
+        if (leadingMatch) add(leadingMatch[1], line);
+      }
+
       for (const line of lines) {
+        addContextualLatinMentions(line);
+
+        const coffeeMention = line.match(/(?:好评的|今年新开的)\s*([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9'’&.\-]*(?:\s+[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9'’&.\-]*){0,4})(?=[，,。])/i);
+        if (coffeeMention && /咖啡|coffee|手冲|flat\s*white/i.test(line)) add(coffeeMention[1], line);
+
         let match = line.match(/^✔️?\s*(?:上午|中午|下午|晚上|早上|傍晚)?\s*[（(]([^）)]{2,42})[）)]\s*[：:，,]?\s*(.*)$/);
         if (match) add(match[1], match[2] || line);
 
@@ -2908,6 +2965,9 @@
 
         match = line.match(/(?:和|、)(壁画村)(?:也去了|去了|，|,|。|$)/);
         if (match) add(match[1], line);
+
+        match = line.match(/(?:早上|中午|下午|傍晚(?:\/晚上)?|晚上)[：:]\s*去([^（(，,。.!！?？]{2,18})(?:[（(，,。.!！?？]|$)/);
+        if (match) add(match[1], line);
       }
 
       return groups;
@@ -3041,6 +3101,23 @@
           const end = Math.min(normalized.length, match.index + match[0].length + 80);
           add(match[1], normalized.slice(start, end).trim());
         }
+      }
+
+      return groups;
+    }
+
+    function appendRecommendationPois(groups, text, city) {
+      const seen = new Set(groups.map((group) => refinePoiTitle(group.title).toLowerCase()).filter(Boolean));
+      const sentences = String(text || "").split(/[。.!！?？\n]/).map((sentence) => sentence.trim()).filter(Boolean);
+
+      for (const sentence of sentences) {
+        const match = sentence.match(/^([^，,。.!！?？]{2,28}?)(?:真的|非常|特别|相当|也)?(?:很|太)?值得(?:一去|去|打卡|逛逛|看看)$/);
+        if (!match) continue;
+        const title = cleanPoiName(match[1]);
+        const key = refinePoiTitle(title).toLowerCase();
+        if (!title || seen.has(key) || !hasPlaceNameShape(title) || looksLikeSentence(title)) continue;
+        seen.add(key);
+        groups.push({ title, area: city.trim(), lines: [sentence], rawLine: sentence });
       }
 
       return groups;
@@ -3351,6 +3428,7 @@
     function isConversationalText(line) {
       const text = String(line || "").trim();
       if (!text) return false;
+      if (/(?:怎么又|为什么|为啥|识别不出来|能不能|请问|帮我看看)/.test(text)) return true;
       if (/^(?:去哪里|哪里|怎么|如何|什么|为什么|能不能|可以吗|有没有|请问|帮我)/.test(text)) return true;
       return /(?:怎么用|如何使用|使用方法|是什么|去哪里|去哪儿|在哪里|在哪儿|怎么去|如何去|怎么玩|值得吗|好不好|能干嘛|求推荐|求问|谢谢)[？?！!。]?$/.test(text);
     }
@@ -3363,6 +3441,7 @@
     function isShortPoiCandidate(line, nextLine, inListSection, startsBlock) {
       const cleaned = cleanPoiName(line);
       if (!inListSection || !startsBlock || !cleaned || cleaned.length > 42) return false;
+      if (isConversationalText(cleaned)) return false;
       if (isSectionHeader(line) || isNoiseLine(line) || looksLikeSentence(cleaned)) return false;
       if (nextLine && isSectionHeader(nextLine)) return false;
       if (/^[0-9A-Za-zÀ-ÿ\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af][0-9A-Za-zÀ-ÿ\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af'’&.\-\s（）()・の]+$/.test(cleaned)) return true;
@@ -3373,6 +3452,7 @@
       const raw = line.trim();
       const cleaned = cleanPoiName(raw);
       if (!cleaned || cleaned.length > 54) return false;
+      if (isConversationalText(cleaned)) return false;
       if (/^\[[一二三四五六七八九十\d]+R\]/.test(raw)) return false;
       if (isDayHeader(raw)) return false;
       if (isAddressLine(raw)) return false;
@@ -3413,7 +3493,7 @@
       return "其他";
     }
 
-    function detectArea(text, city) {
+    function detectArea(text, city, poiName = "") {
       for (const pattern of AREA_PATTERNS) {
         const match = text.match(pattern);
         if (match && match[1]) {
@@ -3424,10 +3504,12 @@
             .trim();
           if (/^(从|但|因为|这次|今天|昨天|后来|可以|几乎|所有|主要|点餐|支付|国内|带了|昨天后来)/.test(area)) continue;
           if (/^(?:沿着|踩着|整条|当天往返|还有|高松逛街)/.test(area)) continue;
+          if (/^(?:[-—、\s]*)?(?:免费街区|就是一个|去|来|看|逛|吃|喝|玩)/.test(area)) continue;
           if (/(?:主路|石板路|温泉街|古早街|小众艺术区)$/.test(area)) continue;
           if (area.length > 18 || /小城/.test(area)) continue;
           if (/Jeans Street/i.test(area) || /^(?:車站|车站)$/.test(area)) continue;
           if (/(周边|指路|下单|回忆|社区)$/.test(area) || /^(但和|店内|时髦社区|友指路)/.test(area)) continue;
+          if (poiName && area.replace(/\s+/g, "") === String(poiName).replace(/\s+/g, "")) continue;
           if (area && city && !area.toLowerCase().includes(city.toLowerCase())) return `${area} / ${city}`;
           if (area) return area;
         }
@@ -3458,12 +3540,42 @@
         .join("、");
     }
 
-    function mapUrl(poi) {
+    function usablePoiArea(poi) {
       const area = String(poi.area || "")
         .replace(/\s*\/\s*/g, " ")
         .replace(/\s+/g, " ")
         .trim();
-      const query = [poi.name, area].filter(Boolean).join(" ");
+      const name = String(poi.name || "").replace(/\s+/g, "");
+      if (!area || area.replace(/\s+/g, "") === name) return "";
+      if (area.length > 48 || /(?:就是|免费|值得|适合|推荐|去|来|逛|吃|喝|玩)/.test(area)) return "";
+      return area;
+    }
+
+    function mapSearchQuery(poi) {
+      const area = usablePoiArea(poi);
+      return [poi.name, area].filter(Boolean).join(" ");
+    }
+
+    function looksLikeMainlandChinaLocation(poi) {
+      const text = [poi.name, poi.area, cityInput.value].filter(Boolean).join(" ");
+      if (/(?:中国|中国大陆|内地|港澳台)/.test(text)) return /(?:中国|中国大陆|内地)/.test(text);
+      return /(北京|上海|广州|深圳|杭州|成都|重庆|武汉|西安|南京|苏州|厦门|长沙|昆明|青岛|大连|天津|郑州|宁波|福州|济南|合肥|无锡|佛山|东莞|珠海|哈尔滨|沈阳|贵阳|南昌|太原|石家庄|兰州|乌鲁木齐|拉萨|海口|三亚|桂林|洛阳|泉州|嘉兴|绍兴|常州|扬州|丽江|大理|张家界|黄山|河北|山西|辽宁|吉林|黑龙江|江苏|浙江|安徽|福建|江西|山东|河南|湖北|湖南|广东|海南|四川|贵州|云南|陕西|甘肃|青海|台湾|内蒙古|广西|西藏|宁夏|新疆)/.test(text);
+    }
+
+    function mapProviderFor(poi) {
+      if (mapProvider !== "auto") return mapProvider;
+      return looksLikeMainlandChinaLocation(poi) ? "amap" : "google";
+    }
+
+    function mapProviderLabel(poi) {
+      return mapProviderFor(poi) === "amap" ? "高德地图" : "Google Maps";
+    }
+
+    function mapUrl(poi) {
+      const query = mapSearchQuery(poi);
+      if (mapProviderFor(poi) === "amap") {
+        return `https://uri.amap.com/search?keyword=${encodeURIComponent(query)}`;
+      }
       return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
     }
 
@@ -3596,15 +3708,13 @@
         startsBlock = false;
       }
       if (current) groups.push(current);
-      const hasExplicitStructuredPoi = groups.some((group) => /^#\s+/.test(String(group.rawLine || "")) || group.isBilingualPoi);
-      if (!hasExplicitStructuredPoi) {
-        appendInlinePois(groups, text, city);
-        appendRouteStopPois(groups, text, city);
-        appendGuideMentionPois(groups, text, city);
-        appendContextMentionPois(groups, text, city);
-        appendDailyListPois(groups, text, city);
-        appendRankedPois(groups, text, city);
-      }
+      appendInlinePois(groups, text, city);
+      appendRouteStopPois(groups, text, city);
+      appendGuideMentionPois(groups, text, city);
+      appendContextMentionPois(groups, text, city);
+      appendRecommendationPois(groups, text, city);
+      appendDailyListPois(groups, text, city);
+      appendRankedPois(groups, text, city);
 
       if (!groups.length) {
         const inlineTitle = parseInlinePoi(text);
@@ -3616,8 +3726,8 @@
         }
       }
 
-      if (groups.length < 3 && !hasExplicitStructuredPoi) appendTravelMentions(groups, text, city);
-      if (groups.length < 3 && !hasExplicitStructuredPoi) appendPageReferencePois(groups, text, city);
+      if (groups.length < 3) appendTravelMentions(groups, text, city);
+      if (groups.length < 3) appendPageReferencePois(groups, text, city);
 
       if (!groups.length) {
         groups.push(...parseEmbeddedPois(text, city));
@@ -3658,11 +3768,12 @@
           const description = group.lines.join("。");
           const fullText = `${name} ${description}`;
           const type = group.type || classifyType(fullText);
-          const area = group.area || inlineArea;
+          const candidateArea = group.area || inlineArea;
+          const area = candidateArea && candidateArea.replace(/\s+/g, "") !== name.replace(/\s+/g, "") ? candidateArea : "";
           return {
             id: uid(),
             name,
-            area: area ? (city.trim() && area.toLowerCase() !== city.trim().toLowerCase() ? `${area} / ${city.trim()}` : area) : detectArea(description, city.trim()),
+            area: area ? (city.trim() && area.toLowerCase() !== city.trim().toLowerCase() ? `${area} / ${city.trim()}` : area) : detectArea(description, city.trim(), name),
             type,
             reason: summarizeReason(name, type, description),
             clue: summarizeClue(description)
@@ -3707,7 +3818,7 @@
       poiBody.innerHTML = "";
       linkDrawer?.classList?.add?.("hidden");
       if (linkDrawer) linkDrawer.innerHTML = "";
-      pois = pois.map((poi) => ({ clue: "", ...poi }));
+      pois = pois.map((poi) => ({ clue: "", ...poi, area: usablePoiArea(poi) }));
       updateResultSummary();
       emptyState.classList.toggle("hidden", pois.length > 0);
       tableWrap.classList.toggle("hidden", pois.length === 0);
@@ -3717,6 +3828,8 @@
       for (const poi of pois) {
         const card = document.createElement("article");
         card.className = "place-card";
+        const area = usablePoiArea(poi);
+        const areaSize = Math.max(4, Math.min(22, Array.from(area).length + 1));
         card.innerHTML = `
           <div class="place-icon" aria-hidden="true">
             <span class="place-pin">📍</span>
@@ -3742,7 +3855,7 @@
             <textarea data-field="reason" aria-label="推荐理由">${escapeHtml(poi.reason)}</textarea>
           </div>
           <div class="place-actions">
-            <a class="btn map-link" href="${mapUrl(poi)}" target="_blank" rel="noopener"><span>Google Maps</span><span aria-hidden="true">↗</span></a>
+            <a class="btn map-link" href="${mapUrl(poi)}" target="_blank" rel="noopener"><span>${mapProviderLabel(poi)}</span><span aria-hidden="true">↗</span></a>
             <button class="btn light place-copy" type="button" title="复制" aria-label="复制">⧉</button>
             <button class="btn danger place-delete" type="button" title="删除" aria-label="删除">✕</button>
           </div>
@@ -3801,7 +3914,7 @@
       }
 
       if (openedCount === validPois.length) {
-        saveStatus.textContent = `已打开 ${openedCount} 个 Google Maps 标签`;
+        saveStatus.textContent = `已打开 ${openedCount} 个地图标签`;
         return;
       }
 
@@ -3819,7 +3932,7 @@
             <span>${index + 1}</span>
             <span>
               <strong>${escapeHtml(poi.name)}</strong>
-              <small>${escapeHtml(String(poi.area || "").replace(/\s*\/\s*/g, " ") || "Google Maps")}</small>
+              <small>${escapeHtml(String(poi.area || "").replace(/\s*\/\s*/g, " ") || mapProviderLabel(poi))}</small>
             </span>
           </a>
         `;
@@ -3832,7 +3945,7 @@
 
       linkDrawer.innerHTML = `
         <div class="link-drawer-head">
-          <span>已生成 ${validPois.length} 个 Google Maps 链接，逐个点击打开</span>
+          <span>已生成 ${validPois.length} 个地图链接，逐个点击打开</span>
           <button class="link-drawer-close" type="button">收起</button>
         </div>
         ${linksHtml}
@@ -3849,6 +3962,7 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         text: sourceText.value,
         city: cityInput.value,
+        mapProvider,
         pois
       }));
       saveStatus.textContent = `已保存 ${new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`;
@@ -4070,6 +4184,8 @@
         const data = JSON.parse(saved);
         sourceText.value = data.text || "";
         cityInput.value = data.city || "";
+        mapProvider = ["auto", "amap", "google"].includes(data.mapProvider) ? data.mapProvider : "auto";
+        mapProviderInput.value = mapProvider;
         pois = Array.isArray(data.pois) ? data.pois.map((poi) => ({ clue: "", ...poi })) : [];
         render();
         saveStatus.textContent = "已恢复上次内容";
@@ -4093,7 +4209,7 @@
     }
 
     function downloadCsv() {
-      const headers = ["POI 名称", "城市/区域", "类型", "推荐理由", "原文线索", "Google Maps 链接"];
+      const headers = ["POI 名称", "城市/区域", "类型", "推荐理由", "原文线索", "地图链接"];
       const rows = pois.map((poi) => [poi.name, poi.area, poi.type, poi.reason, poi.clue, mapUrl(poi)]);
       const csv = [headers, ...rows].map((row) => row.map(csvCell).join(",")).join("\n");
       const blob = new Blob([`\ufeff${csv}`], { type: "text/csv;charset=utf-8" });
@@ -4190,7 +4306,15 @@
     });
     cityInput.addEventListener("input", () => {
       updateResultSummary();
+      render();
       persist();
+    });
+
+    mapProviderInput.addEventListener("change", () => {
+      mapProvider = mapProviderInput.value;
+      render();
+      persist();
+      saveStatus.textContent = mapProvider === "auto" ? "已启用智能地图选择" : `已切换为${mapProvider === "amap" ? "高德地图" : "Google Maps"}`;
     });
 
     loadSaved();
